@@ -404,7 +404,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 5
   maxsp: 6
-  jumpforce: 80000
+  jumpHeight: 3.75
   rb: {fileID: 787433380}
   col: {fileID: 787433381}
   gravitymin: 4
@@ -1321,6 +1321,7 @@ MonoBehaviour:
   resolution: 0.15
   simulationRadius: 0.1
   wenchTolerance: 0
+  perSimulatorMass: 0
 --- !u!4 &1345905144
 Transform:
   m_ObjectHideFlags: 0
