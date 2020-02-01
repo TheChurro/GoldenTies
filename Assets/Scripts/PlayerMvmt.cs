@@ -48,7 +48,7 @@ public class PlayerMvmt : MonoBehaviour
         switch (state)
         {
             case states.grounded:
-                if ((Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W)))
+                if ((Input.GetAxis("Jump"))>0)
                 {
                     rb.AddForce(new Vector2(0, jumpforce));
                     state = states.up;
@@ -59,7 +59,7 @@ public class PlayerMvmt : MonoBehaviour
                 }
                 break;
             case states.up:
-                if (Input.GetKey(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
+                if (Input.GetAxis("Jump")>0)
                 {
                     rb.gravityScale = gravitymin;
                 }
