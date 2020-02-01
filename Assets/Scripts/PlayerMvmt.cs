@@ -7,7 +7,8 @@ public class PlayerMvmt : MonoBehaviour
 {
     public float speed;
     public float maxsp;
-    public float jumpforce;
+    public float jumpHeight;
+    private Vector2 jumpVelocity;
     public Rigidbody2D rb;
     public BoxCollider2D col;
     public float gravitymin;
@@ -27,6 +28,7 @@ public class PlayerMvmt : MonoBehaviour
     void Start()
     {
         state = states.grounded;
+        jumpVelocity = -Physics2D.gravity.normalized * Mathf.Sqrt(2 * Physics2D.gravity.magnitude * gravitymin * jumpHeight);
     }
 
     // Update is called once per frame
@@ -50,7 +52,7 @@ public class PlayerMvmt : MonoBehaviour
             case states.grounded:
                 if ((Input.GetAxis("Jump"))>0)
                 {
-                    rb.AddForce(new Vector2(0, jumpforce));
+                    rb.velocity += jumpVelocity;
                     state = states.up;
                 }
                 else

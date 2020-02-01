@@ -145,7 +145,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 5
   maxsp: 6
-  jumpforce: 80000
+  jumpHeight: 3.75
   rb: {fileID: 7384526842746157791}
   col: {fileID: 7384526842746157790}
   gravitymin: 4
