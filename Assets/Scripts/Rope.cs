@@ -12,6 +12,7 @@ public class Rope : MonoBehaviour
     public float resolution;
     public float simulationRadius;
     public float wenchTolerance;
+    public float perSimulatorMass;
     private FixedJoint2D startConnection;
     private FixedJoint2D endConnection;
     private LineRenderer lineRenderer;
@@ -48,10 +49,11 @@ public class Rope : MonoBehaviour
 
     private (GameObject, Rigidbody2D) SpawnLink() {
         var newSimulationObject = new GameObject();
+        newSimulationObject.layer = LayerMask.NameToLayer("Rope");
         var collider = newSimulationObject.AddComponent<CircleCollider2D>();
         collider.radius = simulationRadius;
         var rigidBody = newSimulationObject.AddComponent<Rigidbody2D>();
-        rigidBody.mass = 1;
+        rigidBody.mass = perSimulatorMass;
         return (newSimulationObject, rigidBody);
     }
 
