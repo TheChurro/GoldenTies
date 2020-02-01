@@ -19,7 +19,7 @@ public class RoomManager : MonoBehaviour
     public GameObject ActiveRoom;
     public GameObject PlayerPrefab;
     private GameObject ActivePlayer;
-    public GameObject Camera;
+    public RoomCamera Camera;
     public RoomDoor[] ActiveDoors;
     public Transform SpawnTrasform;
     // Start is called before the first frame update
@@ -36,6 +36,7 @@ public class RoomManager : MonoBehaviour
         }
         SpawnTrasform = ActiveRoom.transform.Find("Player Spawn");
         ActivePlayer = Instantiate(PlayerPrefab, SpawnTrasform.position, Quaternion.identity);
+        Camera.TrackingObject = ActivePlayer;
     }
 
     public void ChangeRoom(string newRoom, string targetDoor) {
@@ -70,6 +71,7 @@ public class RoomManager : MonoBehaviour
                     DoorTransition.transform.position + offset,
                     Quaternion.identity
                 );
+                Camera.TrackingObject = ActivePlayer;
             }
             SpawnTrasform = roomToActivate.transform.Find("Player Spawn");
         } else {
