@@ -9,11 +9,24 @@ public class PlayerMvmt : MonoBehaviour
     public float maxsp;
     public float jumpforce;
     public Rigidbody2D rb;
-    private Boolean jumped;
+    public BoxCollider2D col;
+    public float gravitymin;
+    public float gravitymax;
+
+    public enum states
+    {
+        grounded,
+        up,
+        down
+    }
+    public states state;
+    public ContactFilter2D filter;
+    public float contactTolerance;
+
     // Start is called before the first frame update
     void Start()
     {
-        jumped = false;
+        state = states.grounded;
     }
 
     // Update is called once per frame
@@ -30,13 +43,50 @@ public class PlayerMvmt : MonoBehaviour
             rb.velocity = new Vector2(-maxsp, rb.velocity.y);
         }
 
-        if(!jumped && (Input.GetKeyDown(KeyCode.UpArrow)||Input.GetKeyDown(KeyCode.W))){
-            rb.AddForce(new Vector2(0,jumpforce));
-            jumped = true;
+        
+
+        switch (state)
+        {
+            case states.grounded:
+                if ((Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W)))
+                {
+                    rb.AddForce(new Vector2(0, jumpforce));
+                    state = states.up;
+                }
+                else
+                {
+                    raycheck();
+                }
+                break;
+            case states.up:
+                if (Input.GetKey(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
+                {
+                    rb.gravityScale = gravitymin;
+                }
+                else
+                {
+                    rb.gravityScale = gravitymax;
+                    state = states.down;
+                }
+                break;
+            case states.down:
+                raycheck();
+                break;
+        }
+
+    void raycheck()
+        {
+            List<RaycastHit2D> results = new List<RaycastHit2D>();
+            var result = Physics2D.BoxCast(rb.position, col.size, rb.rotation, new Vector2(0, -1), filter, results, contactTolerance);
+            if (result == 0)
+            {
+                state = states.down;
+            }
+            else
+            {
+                state = states.grounded;
+            }
         }
     }
-    void OnCollisionEnter2D()
-    {
-        jumped = false;
-    }
+   
 }
