@@ -372,8 +372,8 @@ MonoBehaviour:
   endAttachment: {fileID: 69041835}
   numLinks: 20
   resolution: 0.15
-  simulationRadius: 0.05
-  wenchTolerance: 0.01
+  simulationRadius: 0.1
+  wenchTolerance: 0.05
 --- !u!4 &1920276280
 Transform:
   m_ObjectHideFlags: 0
