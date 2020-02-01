@@ -161,6 +161,6 @@ public class Rope : MonoBehaviour
     void Update() {
         // Update our line renderer
         DrawRope();
-        Wench(0.05f * Time.deltaTime);
+        Wench(0.5f * Time.deltaTime);
     }
 }
