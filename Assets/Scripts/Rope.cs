@@ -5,8 +5,8 @@ using UnityEngine;
 public class Rope : MonoBehaviour
 {
     public bool fixStart;
-    public List<Rigidbody2D> ropeSegments;
-    public List<DistanceJoint2D> ropeConnections;
+    public List<Rigidbody2D> ropePoints;
+    public List<DistanceJoint2D> ropeSegments;
     public GameObject endAttachment;
     public int numLinks;
     public float resolution;
@@ -19,12 +19,12 @@ public class Rope : MonoBehaviour
     void Start()
     {
         this.lineRenderer = this.GetComponent<LineRenderer>();
-        ropeSegments = new List<Rigidbody2D>();
-        ropeConnections = new List<DistanceJoint2D>();
+        ropePoints = new List<Rigidbody2D>();
+        ropeSegments = new List<DistanceJoint2D>();
         // Add the first point in the rope. This has different properties than other
         // points in that it does not connect to any other link and may be fixed
         // to this rigidbody
-        var spawnedObject = spawnLink();
+        var spawnedObject = SpawnLink();
         var newSimulationObject = spawnedObject.Item1;
         var rigidBody = spawnedObject.Item2;
         newSimulationObject.GetComponent<Collider2D>().enabled = false;
@@ -35,7 +35,7 @@ public class Rope : MonoBehaviour
             startConnection.anchor = Vector2.zero;
         }
         newSimulationObject.transform.position = this.transform.position;
-        ropeSegments.Add(rigidBody);
+        ropePoints.Add(rigidBody);
 
         if (endAttachment != null) {
             AttachTo(endAttachment.GetComponent<Rigidbody2D>());
@@ -46,7 +46,7 @@ public class Rope : MonoBehaviour
         }
     }
 
-    private (GameObject, Rigidbody2D) spawnLink() {
+    private (GameObject, Rigidbody2D) SpawnLink() {
         var newSimulationObject = new GameObject();
         var collider = newSimulationObject.AddComponent<CircleCollider2D>();
         collider.radius = simulationRadius;
@@ -56,19 +56,19 @@ public class Rope : MonoBehaviour
     }
 
     private void AddLink(Vector3 position) {
-        var spawnedObject = spawnLink();
+        var spawnedObject = SpawnLink();
         var newSimulationObject = spawnedObject.Item1;
         var rigidBody = spawnedObject.Item2;
         var joint = newSimulationObject.AddComponent<DistanceJoint2D>();
         joint.autoConfigureConnectedAnchor = false;
         joint.autoConfigureDistance = false;
-        joint.connectedBody = ropeSegments[ropeSegments.Count - 1];
+        joint.connectedBody = ropePoints[ropePoints.Count - 1];
         joint.anchor = Vector2.zero;
         joint.connectedAnchor = Vector2.zero;
         joint.distance = resolution;
         joint.maxDistanceOnly = true;
-        ropeConnections.Add(joint);
-        ropeSegments.Add(rigidBody);
+        ropeSegments.Add(joint);
+        ropePoints.Add(rigidBody);
         newSimulationObject.transform.position = position;
     }
 
@@ -78,7 +78,7 @@ public class Rope : MonoBehaviour
         }
         var targetCollider = target.GetComponent<Collider2D>();
         for (int i = 0; i < 50; i++) {
-            var lastSegment = ropeSegments[ropeSegments.Count - 1];
+            var lastSegment = ropePoints[ropePoints.Count - 1];
             var lastSegPos3 = lastSegment.transform.position;
             var lastSegPos = new Vector2(lastSegPos3.x, lastSegPos3.y);
             var closestPoint = targetCollider.ClosestPoint(lastSegPos);
@@ -99,27 +99,27 @@ public class Rope : MonoBehaviour
     }
 
     public void Wench(float amount) {
-        if (ropeConnections.Count == 0) {
+        if (ropeSegments.Count == 0) {
             return;
         }
-        if (ropeConnections[0].distance < wenchTolerance / 2) {
+        if (ropeSegments[0].distance < wenchTolerance / 2) {
             // If we have effectively connect the start point and the next point, then we
             // want to check for the two bodies actually being close together
-            float dist = (ropeSegments[0].position - ropeSegments[1].position).magnitude;
+            float dist = (ropePoints[0].position - ropePoints[1].position).magnitude;
             if (dist < wenchTolerance) {
                 // Now we will remove the second rope point and update the connection of the
                 // next rope point to the start. But first we need to see if we are removing
                 // the end rope point.
-                if (ropeConnections.Count == 1) {
+                if (ropeSegments.Count == 1) {
                     // If we are dragging and object, then anchor that object to the
                     // start node. So if we give it lenience, it will be pulled back out.
                     if (endConnection != null) {
                         var newEndConnection = endConnection.gameObject.AddComponent<FixedJoint2D>();
                         newEndConnection.autoConfigureConnectedAnchor = false;
-                        newEndConnection.connectedBody = ropeSegments[0];
+                        newEndConnection.connectedBody = ropePoints[0];
                         newEndConnection.connectedAnchor = Vector2.zero;
                         newEndConnection.anchor = endConnection.anchor;
-                        // Destroy the attachment to ropeSegments[1].
+                        // Destroy the attachment to ropePoints[1].
                         Destroy(endConnection);
                         endConnection = newEndConnection;
                     }
@@ -127,32 +127,93 @@ public class Rope : MonoBehaviour
                     // Otherwise, there is another point. Attach that point to the base point and
                     // remove the old connection. Keep the current distance between the second point
                     // and base point as their distance for now. It will be wenched together later.
-                    var newJoint = ropeSegments[2].gameObject.AddComponent<DistanceJoint2D>();
+                    var newJoint = ropePoints[2].gameObject.AddComponent<DistanceJoint2D>();
                     newJoint.autoConfigureConnectedAnchor = false;
                     newJoint.autoConfigureDistance = false;
-                    newJoint.connectedBody = ropeSegments[0];
+                    newJoint.connectedBody = ropePoints[0];
                     newJoint.connectedAnchor = Vector2.zero;
                     newJoint.anchor = Vector2.zero;
-                    newJoint.distance = (ropeSegments[0].position - ropeSegments[2].position).magnitude;
-                    Destroy(ropeConnections[1]);
-                    ropeConnections[1] = newJoint;
+                    newJoint.distance = (ropePoints[0].position - ropePoints[2].position).magnitude;
+                    Destroy(ropeSegments[1]);
+                    ropeSegments[1] = newJoint;
                 }
-                Destroy(ropeSegments[1].gameObject);
-                ropeSegments.RemoveAt(1);
-                ropeConnections.RemoveAt(0);
+                Destroy(ropePoints[1].gameObject);
+                ropePoints.RemoveAt(1);
+                ropeSegments.RemoveAt(0);
             }
         } else {
-            amount = Mathf.Min(amount, ropeConnections[0].distance);
-            ropeConnections[0].distance -= amount;
+            amount = Mathf.Min(amount, ropeSegments[0].distance);
+            ropeSegments[0].distance -= amount;
         }
+    }
+
+    public void Release(float amount) {
+        if (ropeSegments.Count > 0 && ropeSegments[0].distance < resolution) {
+            float lastDist = ropeSegments[0].distance;
+            ropeSegments[0].distance = Mathf.Min(lastDist + amount, resolution);
+            amount -= ropeSegments[0].distance - lastDist;
+        }
+        if (amount < 0.0001) {
+            return;
+        }
+        amount = Mathf.Min(amount, resolution);
+        var spawnedObject = SpawnLink();
+        var newSimulationObject = spawnedObject.Item1;
+        var rigidBody = spawnedObject.Item2;
+        if (ropePoints.Count == 1) {
+            newSimulationObject.transform.position = ropePoints[0].transform.position - new Vector3(0, resolution, 0);
+        } else {
+            newSimulationObject.transform.position = (1 - amount / resolution) * ropePoints[0].transform.position + amount / resolution * ropePoints[1].transform.position;
+        }
+        rigidBody.position = new Vector2(newSimulationObject.transform.position.x, newSimulationObject.transform.position.y);
+        
+        // Create a joint between the new rope point and the start
+        var joint = newSimulationObject.AddComponent<DistanceJoint2D>();
+        joint.autoConfigureDistance = false;
+        joint.autoConfigureConnectedAnchor = false;
+        joint.connectedBody = ropePoints[0];
+        joint.connectedAnchor = Vector2.zero;
+        joint.anchor = Vector2.zero;
+        joint.distance = amount;
+
+        if (ropeSegments.Count == 0) {
+            // When we are adding the first rope segment, check to see if we have attached a body
+            // and reattach that body to the new rope point. This will be the end of the rope.
+            if (endConnection != null) {
+                var newEndConnection = endConnection.gameObject.AddComponent<FixedJoint2D>();
+                newEndConnection.autoConfigureConnectedAnchor = false;
+                newEndConnection.connectedBody = rigidBody;
+                newEndConnection.connectedAnchor = Vector2.zero;
+                newEndConnection.anchor = endConnection.anchor;
+                // Destroy the attachment to ropePoints[0].
+                Destroy(endConnection);
+                endConnection = newEndConnection;
+            }
+        } else {
+            // Otherwise, we are inserting a new rope point bewteen the start and second point.
+            // We need to remove the connection from the old second point to the start, and create
+            // one bewteen the new second point and the old second point.
+            var newJoint = ropePoints[1].gameObject.AddComponent<DistanceJoint2D>();
+            newJoint.autoConfigureConnectedAnchor = false;
+            newJoint.autoConfigureDistance = false;
+            newJoint.connectedBody = rigidBody;
+            newJoint.distance = resolution;
+            newJoint.anchor = Vector2.zero;
+            newJoint.connectedAnchor = Vector2.zero;
+            Destroy(ropeSegments[0]);
+            ropeSegments[0] = newJoint;
+        }
+        // Insert our new points and segments.
+        ropeSegments.Insert(0, joint);
+        ropePoints.Insert(1, rigidBody);
     }
 
     void DrawRope() {
         lineRenderer.startWidth = simulationRadius;
         lineRenderer.endWidth = simulationRadius;
-        Vector3[] ropePositions = new Vector3[this.ropeSegments.Count];
+        Vector3[] ropePositions = new Vector3[this.ropePoints.Count];
         for (int i = 0; i < ropePositions.Length; i++) {
-            ropePositions[i] = ropeSegments[i].position;
+            ropePositions[i] = ropePoints[i].position;
         }
         lineRenderer.positionCount = ropePositions.Length;
         lineRenderer.SetPositions(ropePositions);
@@ -161,6 +222,5 @@ public class Rope : MonoBehaviour
     void Update() {
         // Update our line renderer
         DrawRope();
-        Wench(0.5f * Time.deltaTime);
     }
 }
