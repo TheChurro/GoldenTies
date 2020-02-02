@@ -819,6 +819,7 @@ MonoBehaviour:
   - {fileID: 1184131789231373963, guid: 15a385ddbed7d45e4a417cdbfb5aca5b, type: 3}
   - {fileID: 8085489852475644252, guid: cf0dde01668624b09aeab9f71478d3cf, type: 3}
   - {fileID: 8085489852475644252, guid: 900ba44e89c3e4bbdb2d6ff060909509, type: 3}
+  - {fileID: 8085489852475644252, guid: f9f86db8bad514db1bb8aafe081857b7, type: 3}
   collected: 
   InitialRoom: Bridge Segment 2
   ActiveRoom: {fileID: 0}
