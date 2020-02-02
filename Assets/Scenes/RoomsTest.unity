@@ -800,7 +800,7 @@ MonoBehaviour:
   cameraStaySize: {x: 3, y: 0.5}
   cameraRestoreSize: {x: 0.5, y: 0.25}
   cameraJumpSize: {x: 5, y: 5}
-  cameraMovementRate: 1
+  cameraMovementRate: 10
 --- !u!114 &456061883
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -829,7 +829,7 @@ MonoBehaviour:
   Camera: {fileID: 456061882}
   ActiveDoors: []
   SpawnTrasform: {fileID: 0}
-  deletesave: 0
+  deletesave: 1
   flags: []
 --- !u!81 &456061884
 AudioListener:
@@ -1991,10 +1991,10 @@ MonoBehaviour:
   m_outlineColor:
     serializedVersion: 2
     rgba: 4278190080
-  m_fontSize: 36
+  m_fontSize: 41.65
   m_fontSizeBase: 36
   m_fontWeight: 400
-  m_enableAutoSizing: 0
+  m_enableAutoSizing: 1
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
