@@ -254,7 +254,7 @@ GameObject:
   - component: {fileID: 1184131789231373965}
   - component: {fileID: 1184131789231373962}
   m_Layer: 0
-  m_Name: Test Level 5
+  m_Name: Old Man Segment 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2250,7 +2250,7 @@ Tilemap:
     second:
       serializedVersion: 2
       m_TileIndex: 10
-      m_TileSpriteIndex: 10
+      m_TileSpriteIndex: 11
       m_TileMatrixIndex: 0
       m_TileColorIndex: 0
       m_TileObjectToInstantiateIndex: 65535
@@ -2394,7 +2394,7 @@ Tilemap:
     second:
       serializedVersion: 2
       m_TileIndex: 5
-      m_TileSpriteIndex: 9
+      m_TileSpriteIndex: 10
       m_TileMatrixIndex: 0
       m_TileColorIndex: 0
       m_TileObjectToInstantiateIndex: 65535
@@ -3614,12 +3614,12 @@ Tilemap:
     m_Data: {fileID: 21300000, guid: ddebdb968991eb848bb47ec2d6eb59f9, type: 3}
   - m_RefCount: 145
     m_Data: {fileID: 21300000, guid: 2e21290a750715b48a8d612656425380, type: 3}
+  - m_RefCount: 0
+    m_Data: {fileID: 0}
   - m_RefCount: 1
     m_Data: {fileID: 21300000, guid: 9e3a10a024987ba40900c9b4d50a934d, type: 3}
   - m_RefCount: 1
     m_Data: {fileID: 21300000, guid: 0554b1b0b7706a04ea4a118af6606064, type: 3}
-  - m_RefCount: 0
-    m_Data: {fileID: 0}
   m_TileMatrixArray:
   - m_RefCount: 359
     m_Data:
@@ -10342,7 +10342,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: acb99151ba3194c0682bcac2c9d3f5c9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  RoomTo: Test Level 4
+  RoomTo: Old Man Segment 1
   DoorTo: Right Door
   EnterFrom: 1
 --- !u!61 &8176855314039318346
@@ -11792,7 +11792,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: acb99151ba3194c0682bcac2c9d3f5c9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  RoomTo: Test Level 1
+  RoomTo: Old Man Segment 3
   DoorTo: Left Door
   EnterFrom: 3
 --- !u!61 &1863303263572134639
