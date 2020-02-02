@@ -28,6 +28,7 @@ public class RoomManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        roomTransitionHandlers = new List<OnRoomTransition>();
         SaveSystem.DestroyData();
         RoomMap = new Dictionary<string, GameObject>();
         foreach (RoomEntry entry in Rooms) {
@@ -73,6 +74,7 @@ public class RoomManager : MonoBehaviour
                 Destroy(roomToActivate);
                 return;
             }
+            BroadcastRoomTransition(true);
             Destroy(ActiveRoom);
             ActiveRoom = roomToActivate;
             ActiveDoors = newDoors;
@@ -108,6 +110,7 @@ public class RoomManager : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.F2))
         {
+            BroadcastRoomTransition(false);
             GameData data = SaveSystem.Loadgame();
 
             Destroy(ActiveRoom);
@@ -124,4 +127,19 @@ public class RoomManager : MonoBehaviour
             ceram.ceramicnumber = data.ceramics;
         }
     }
+
+    private List<OnRoomTransition> roomTransitionHandlers;
+    public void RegisterTransitionHandler(OnRoomTransition handler) {
+        roomTransitionHandlers.Add(handler);
+    }
+    void BroadcastRoomTransition(bool willSave) {
+        foreach (OnRoomTransition handler in roomTransitionHandlers) {
+            handler.OnRoomTransition(this, willSave);
+        }
+        roomTransitionHandlers.Clear();
+    }
+}
+
+public interface OnRoomTransition {
+    void OnRoomTransition(RoomManager manager, bool willSave);
 }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Rope : MonoBehaviour
+public class Rope : MonoBehaviour, OnRoomTransition
 {
     public bool fixStart;
     public List<Rigidbody2D> ropePoints;
@@ -19,6 +19,10 @@ public class Rope : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        var manager = FindObjectOfType<RoomManager>();
+        if (manager != null) {
+            manager.RegisterTransitionHandler(this);
+        }
         this.lineRenderer = this.GetComponent<LineRenderer>();
         ropePoints = new List<Rigidbody2D>();
         ropeSegments = new List<DistanceJoint2D>();
@@ -52,6 +56,14 @@ public class Rope : MonoBehaviour
         newSimulationObject.layer = LayerMask.NameToLayer("Rope");
         var collider = newSimulationObject.AddComponent<CircleCollider2D>();
         collider.radius = simulationRadius;
+        var childTriggerObject = new GameObject();
+        childTriggerObject.transform.parent = newSimulationObject.transform;
+        childTriggerObject.transform.localPosition = Vector3.zero;
+        childTriggerObject.layer = LayerMask.NameToLayer("RopeTrigger");
+        var childCollider = childTriggerObject.AddComponent<CircleCollider2D>();
+        childCollider.isTrigger = true;
+        childCollider.radius = simulationRadius;
+        childTriggerObject.AddComponent<RopeProxy>().obj = this;
         var rigidBody = newSimulationObject.AddComponent<Rigidbody2D>();
         rigidBody.mass = perSimulatorMass;
         return (newSimulationObject, rigidBody);
@@ -135,6 +147,7 @@ public class Rope : MonoBehaviour
                     newJoint.connectedBody = ropePoints[0];
                     newJoint.connectedAnchor = Vector2.zero;
                     newJoint.anchor = Vector2.zero;
+                    newJoint.maxDistanceOnly = true;
                     newJoint.distance = (ropePoints[0].position - ropePoints[2].position).magnitude;
                     Destroy(ropeSegments[1]);
                     ropeSegments[1] = newJoint;
@@ -143,17 +156,21 @@ public class Rope : MonoBehaviour
                 ropePoints.RemoveAt(1);
                 ropeSegments.RemoveAt(0);
             }
-        } else {
-            amount = Mathf.Min(amount, ropeSegments[0].distance);
-            ropeSegments[0].distance -= amount;
+        }
+        for (int i = 0; (i < ropeSegments.Count) && (amount >= 0.001 * wenchTolerance); i++) {
+            var change = Mathf.Min(amount, ropeSegments[i].distance - 0.005f);
+            ropeSegments[i].distance -= change;
+            amount -= change;
         }
     }
 
     public void Release(float amount) {
-        if (ropeSegments.Count > 0 && ropeSegments[0].distance < resolution) {
-            float lastDist = ropeSegments[0].distance;
-            ropeSegments[0].distance = Mathf.Min(lastDist + amount, resolution);
-            amount -= ropeSegments[0].distance - lastDist;
+        for (int i = 0; (i < ropeSegments.Count) && (amount >= 0.001 * wenchTolerance); i++) {
+            if (ropeSegments[i].distance < resolution) {
+                float lastDist = ropeSegments[i].distance;
+                ropeSegments[i].distance = Mathf.Min(lastDist + amount, resolution);
+                amount -= ropeSegments[i].distance - lastDist;
+            }
         }
         if (amount < 0.0001) {
             return;
@@ -177,6 +194,7 @@ public class Rope : MonoBehaviour
         joint.connectedAnchor = Vector2.zero;
         joint.anchor = Vector2.zero;
         joint.distance = amount;
+        joint.maxDistanceOnly = true;
 
         if (ropeSegments.Count == 0) {
             // When we are adding the first rope segment, check to see if we have attached a body
@@ -202,6 +220,7 @@ public class Rope : MonoBehaviour
             newJoint.distance = resolution;
             newJoint.anchor = Vector2.zero;
             newJoint.connectedAnchor = Vector2.zero;
+            newJoint.maxDistanceOnly = true;
             Destroy(ropeSegments[0]);
             ropeSegments[0] = newJoint;
         }
@@ -225,4 +244,22 @@ public class Rope : MonoBehaviour
         // Update our line renderer
         DrawRope();
     }
+
+    public void Destroy() {
+        if (endConnection != null) {
+            Destroy(endConnection);
+        }
+        foreach (var point in ropePoints) {
+            Destroy(point.gameObject);
+        }
+        Destroy(this.gameObject);
+    }
+
+    public void OnRoomTransition(RoomManager manager, bool willSave) {
+        this.Destroy();
+    } 
+}
+
+public class RopeProxy : MonoBehaviour {
+    public Rope obj;
 }

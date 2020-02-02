@@ -127,7 +127,7 @@ MonoBehaviour:
   ropeHangPoint: {fileID: 2798637043919647796}
   rope: {fileID: 0}
   wenchRate: 0.5
-  releaseRate: 0.5
+  releaseRate: 1
 --- !u!1 &5974179618962579700
 GameObject:
   m_ObjectHideFlags: 0
@@ -298,7 +298,7 @@ BoxCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
@@ -2936,6 +2936,7 @@ GameObject:
   - component: {fileID: 3749073092249520297}
   - component: {fileID: 6376146793687431214}
   - component: {fileID: 2169200134838276569}
+  - component: {fileID: 2069255424098420458}
   m_Layer: 0
   m_Name: Rock
   m_TagString: Untagged
@@ -3019,7 +3020,7 @@ Rigidbody2D:
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
-  m_Mass: 10000
+  m_Mass: 100
   m_LinearDrag: 0
   m_AngularDrag: 0.05
   m_GravityScale: 1
@@ -3054,3 +3055,16 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
+--- !u!114 &2069255424098420458
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8681794328283306437}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e7e94096c2588421e9827b103c30e7af, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Collider: {fileID: 0}

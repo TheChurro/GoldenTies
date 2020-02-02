@@ -50,10 +50,10 @@ MonoBehaviour:
   ropeSegments: []
   endAttachment: {fileID: 0}
   numLinks: 10
-  resolution: 0.15
+  resolution: 0.25
   simulationRadius: 0.1
   wenchTolerance: 0.05
-  perSimulatorMass: 5
+  perSimulatorMass: 0.1
 --- !u!120 &8791438506876188645
 LineRenderer:
   m_ObjectHideFlags: 0

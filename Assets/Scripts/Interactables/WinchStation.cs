@@ -3,13 +3,19 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Collider2D))]
-public class WinchStation : MonoBehaviour
+public class WinchStation : MonoBehaviour, OnRoomTransition
 {
     public GameObject ropePrefab;
     public Transform ropeHangPoint;
     public Rope rope;
     public float wenchRate;
     public float releaseRate;
+    void Start() {
+        var manager = FindObjectOfType<RoomManager>();
+        if (manager != null) {
+            manager.RegisterTransitionHandler(this);
+        }
+    }
     public bool MakeRope() {
         if (rope == null) {
             var ropeObject = Instantiate(ropePrefab, ropeHangPoint.position, ropeHangPoint.rotation);
@@ -21,7 +27,7 @@ public class WinchStation : MonoBehaviour
 
     public bool TakeRope() {
         if (rope != null) {
-            Destroy(rope.gameObject);
+            rope.Destroy();
             rope = null;
             return true;
         }
@@ -42,5 +48,9 @@ public class WinchStation : MonoBehaviour
 
     public bool HasRope() {
         return rope != null;
+    }
+
+    public void OnRoomTransition(RoomManager manager, bool willSave) {
+        // TODO: Write to save data whether this object has a rope.
     }
 }
