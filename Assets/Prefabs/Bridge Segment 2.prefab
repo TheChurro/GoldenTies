@@ -1207,15 +1207,6 @@ Tilemap:
       m_TileColorIndex: 0
       m_TileObjectToInstantiateIndex: 65535
       m_AllTileFlags: 1073741825
-  - first: {x: -8, y: -6, z: 0}
-    second:
-      serializedVersion: 2
-      m_TileIndex: 11
-      m_TileSpriteIndex: 11
-      m_TileMatrixIndex: 0
-      m_TileColorIndex: 0
-      m_TileObjectToInstantiateIndex: 65535
-      m_AllTileFlags: 1073741825
   - first: {x: -4, y: -6, z: 0}
     second:
       serializedVersion: 2
@@ -1329,15 +1320,6 @@ Tilemap:
       serializedVersion: 2
       m_TileIndex: 15
       m_TileSpriteIndex: 15
-      m_TileMatrixIndex: 0
-      m_TileColorIndex: 0
-      m_TileObjectToInstantiateIndex: 65535
-      m_AllTileFlags: 1073741825
-  - first: {x: -7, y: -5, z: 0}
-    second:
-      serializedVersion: 2
-      m_TileIndex: 0
-      m_TileSpriteIndex: 0
       m_TileMatrixIndex: 0
       m_TileColorIndex: 0
       m_TileObjectToInstantiateIndex: 65535
@@ -1563,15 +1545,6 @@ Tilemap:
       serializedVersion: 2
       m_TileIndex: 15
       m_TileSpriteIndex: 15
-      m_TileMatrixIndex: 0
-      m_TileColorIndex: 0
-      m_TileObjectToInstantiateIndex: 65535
-      m_AllTileFlags: 1073741825
-  - first: {x: -7, y: -4, z: 0}
-    second:
-      serializedVersion: 2
-      m_TileIndex: 0
-      m_TileSpriteIndex: 0
       m_TileMatrixIndex: 0
       m_TileColorIndex: 0
       m_TileObjectToInstantiateIndex: 65535
@@ -1846,7 +1819,7 @@ Tilemap:
       m_TileColorIndex: 0
       m_TileObjectToInstantiateIndex: 65535
       m_AllTileFlags: 1073741825
-  - first: {x: -11, y: 0, z: 0}
+  - first: {x: -11, y: 1, z: 0}
     second:
       serializedVersion: 2
       m_TileIndex: 7
@@ -1855,29 +1828,11 @@ Tilemap:
       m_TileColorIndex: 0
       m_TileObjectToInstantiateIndex: 65535
       m_AllTileFlags: 1073741825
-  - first: {x: -10, y: 0, z: 0}
+  - first: {x: -10, y: 1, z: 0}
     second:
       serializedVersion: 2
       m_TileIndex: 2
       m_TileSpriteIndex: 2
-      m_TileMatrixIndex: 0
-      m_TileColorIndex: 0
-      m_TileObjectToInstantiateIndex: 65535
-      m_AllTileFlags: 1073741825
-  - first: {x: -11, y: 1, z: 0}
-    second:
-      serializedVersion: 2
-      m_TileIndex: 14
-      m_TileSpriteIndex: 14
-      m_TileMatrixIndex: 0
-      m_TileColorIndex: 0
-      m_TileObjectToInstantiateIndex: 65535
-      m_AllTileFlags: 1073741825
-  - first: {x: -10, y: 1, z: 0}
-    second:
-      serializedVersion: 2
-      m_TileIndex: 6
-      m_TileSpriteIndex: 9
       m_TileMatrixIndex: 0
       m_TileColorIndex: 0
       m_TileObjectToInstantiateIndex: 65535
@@ -2199,7 +2154,7 @@ Tilemap:
       m_AllTileFlags: 1073741825
   m_AnimatedTiles: {}
   m_TileAssetArray:
-  - m_RefCount: 18
+  - m_RefCount: 16
     m_Data: {fileID: 11400000, guid: 7cf2da0b97efe3d499bd0ca403bf42f8, type: 2}
   - m_RefCount: 1
     m_Data: {fileID: 11400000, guid: 49b0550424cc4bb42b82ae00e499e6d4, type: 2}
@@ -2211,8 +2166,8 @@ Tilemap:
     m_Data: {fileID: 0}
   - m_RefCount: 0
     m_Data: {fileID: 0}
-  - m_RefCount: 1
-    m_Data: {fileID: 11400000, guid: 5c712c219f347d846b935d33fdecb8c3, type: 2}
+  - m_RefCount: 0
+    m_Data: {fileID: 0}
   - m_RefCount: 25
     m_Data: {fileID: 11400000, guid: 51784ace044feec47a1e2e78e044e20a, type: 2}
   - m_RefCount: 0
@@ -2221,18 +2176,18 @@ Tilemap:
     m_Data: {fileID: 0}
   - m_RefCount: 0
     m_Data: {fileID: 0}
-  - m_RefCount: 61
+  - m_RefCount: 60
     m_Data: {fileID: 11400000, guid: 785599e78adb801429679ae6e323f996, type: 2}
   - m_RefCount: 3
     m_Data: {fileID: 11400000, guid: 3a8bb3a5bc471a549988f3eb72f2d580, type: 2}
   - m_RefCount: 9
     m_Data: {fileID: 11400000, guid: 14cb33279d486784eace918de63529a6, type: 2}
-  - m_RefCount: 39
+  - m_RefCount: 38
     m_Data: {fileID: 11400000, guid: ac61a03d8980bb34c97a1411d3513907, type: 2}
   - m_RefCount: 18
     m_Data: {fileID: 11400000, guid: a98a80261aa103748aaa0449ba7da9d6, type: 2}
   m_TileSpriteArray:
-  - m_RefCount: 18
+  - m_RefCount: 16
     m_Data: {fileID: 21300000, guid: afa753c4de92967499a61ca517d3d4be, type: 3}
   - m_RefCount: 0
     m_Data: {fileID: 0}
@@ -2250,22 +2205,22 @@ Tilemap:
     m_Data: {fileID: 21300000, guid: ddebdb968991eb848bb47ec2d6eb59f9, type: 3}
   - m_RefCount: 0
     m_Data: {fileID: 0}
-  - m_RefCount: 1
-    m_Data: {fileID: 21300000, guid: 64baf36e4fc11c140b6b72255870f43b, type: 3}
+  - m_RefCount: 0
+    m_Data: {fileID: 0}
   - m_RefCount: 1
     m_Data: {fileID: 21300000, guid: 9f1d4152d1bcdec408d6279278596108, type: 3}
-  - m_RefCount: 61
+  - m_RefCount: 60
     m_Data: {fileID: 21300000, guid: 9849ce8440f1ef9499dd1c645d0b4bb8, type: 3}
   - m_RefCount: 3
     m_Data: {fileID: 21300000, guid: 9e3a10a024987ba40900c9b4d50a934d, type: 3}
   - m_RefCount: 9
     m_Data: {fileID: 21300000, guid: 92b9937db8570814dbae9113c9410f14, type: 3}
-  - m_RefCount: 39
+  - m_RefCount: 38
     m_Data: {fileID: 21300000, guid: 2e21290a750715b48a8d612656425380, type: 3}
   - m_RefCount: 18
     m_Data: {fileID: 21300000, guid: 8100dfaf95ca66c4a989d4e6f3041b9a, type: 3}
   m_TileMatrixArray:
-  - m_RefCount: 192
+  - m_RefCount: 187
     m_Data:
       e00: 1
       e01: 0
@@ -2284,7 +2239,7 @@ Tilemap:
       e32: 0
       e33: 1
   m_TileColorArray:
-  - m_RefCount: 192
+  - m_RefCount: 187
     m_Data: {r: 1, g: 1, b: 1, a: 1}
   m_TileObjectToInstantiateArray: []
   m_AnimationFrameRate: 1
@@ -2415,8 +2370,6 @@ CompositeCollider2D:
   - m_Collider: {fileID: 6654817541187442809}
     m_ColliderPaths:
     - - X: -89999900
-        Y: -41
-      - X: -89999900
         Y: 19999900
       - X: -79999959
         Y: 19999900
@@ -2449,11 +2402,13 @@ CompositeCollider2D:
       - X: -110000100
         Y: 50000041
       - X: -110000100
-        Y: -41
+        Y: 10000041
       - X: -110000041
-        Y: -100
+        Y: 10000100
       - X: -89999959
-        Y: -100
+        Y: 10000100
+      - X: -89999900
+        Y: 10000041
     - - X: 170000100
         Y: -130000041
       - X: 170000100
@@ -2487,19 +2442,17 @@ CompositeCollider2D:
       - X: -80000100
         Y: -70000041
       - X: -80000100
-        Y: -59999959
+        Y: -49999959
       - X: -80000041
-        Y: -59999900
-      - X: -69999959
-        Y: -59999900
-      - X: -69999900
-        Y: -59999959
-      - X: -69999900
-        Y: -50000100
-      - X: -60000041
-        Y: -50000100
+        Y: -49999900
+      - X: -70000100
+        Y: -49999900
+      - X: -70000100
+        Y: -29999959
+      - X: -70000041
+        Y: -29999900
       - X: -60000100
-        Y: -50000041
+        Y: -29999900
       - X: -60000100
         Y: -9999900
       - X: -110000041
@@ -2606,7 +2559,7 @@ CompositeCollider2D:
         Y: -99999959
   m_CompositePaths:
     m_Paths:
-    - - {x: -9.000026, y: -0.00001}
+    - - {x: -9.000019, y: 1.000004}
       - {x: -8.999961, y: 1.99999}
       - {x: -7.9999905, y: 2.0000253}
       - {x: -7.999961, y: 2.99999}
@@ -2615,7 +2568,7 @@ CompositeCollider2D:
       - {x: 17.00001, y: 4.0000253}
       - {x: 16.999975, y: 5.00001}
       - {x: -11.00001, y: 4.9999747}
-      - {x: -10.999974, y: -0.00001}
+      - {x: -10.999974, y: 1.00001}
     - - {x: 16.999975, y: -13.00001}
       - {x: 16.999975, y: -12.00001}
       - {x: 1.00001, y: -11.999961}
@@ -2623,10 +2576,10 @@ CompositeCollider2D:
       - {x: -6.9999905, y: -9.999961}
       - {x: -7.0000257, y: -8.99999}
       - {x: -7.9999905, y: -8.999961}
-      - {x: -7.9999747, y: -5.99999}
-      - {x: -6.9999905, y: -5.9999666}
-      - {x: -6.999961, y: -5.00001}
-      - {x: -6.00001, y: -4.9999747}
+      - {x: -7.9999747, y: -4.99999}
+      - {x: -7.0000095, y: -4.999961}
+      - {x: -6.9999743, y: -2.99999}
+      - {x: -6.00001, y: -2.999961}
       - {x: -6.000039, y: -0.99999}
       - {x: -11.00001, y: -1.0000252}
       - {x: -10.999974, y: -13.00001}
@@ -3157,7 +3110,7 @@ MonoBehaviour:
     - Topaz Quest Complete
     flagsRemove:
     - Wood Planks
-    - Broken Bridge
+    - Bridge Broken
   - flagNeeded: Topaz Quest Start
     dialog:
     - Speaker: Topaz
@@ -3185,7 +3138,7 @@ MonoBehaviour:
     reward: 
     flagsSet:
     - Topaz Quest Start
-    - Broken Bridge
+    - Bridge Broken
     flagsRemove: []
 --- !u!1 &6868909605264514407
 GameObject:
@@ -8539,7 +8492,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8933332238404459771}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 8.99, y: -8.45, z: 0}
+  m_LocalPosition: {x: 8.99, y: -9.53, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 7412335404933009892}

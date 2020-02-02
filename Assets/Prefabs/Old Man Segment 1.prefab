@@ -6389,7 +6389,7 @@ PrefabInstance:
     - target: {fileID: 5464274569239042203, guid: 21a06d35a5c912c458e4e1c13e45af00,
         type: 3}
       propertyPath: interactions.Array.data[0].flagsSet.Array.data[2]
-      value: Broken Bridge
+      value: Bridge Broken
       objectReference: {fileID: 0}
     - target: {fileID: 6367800494054577320, guid: 21a06d35a5c912c458e4e1c13e45af00,
         type: 3}
