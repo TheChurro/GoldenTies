@@ -20,6 +20,7 @@ public class RoomManager : MonoBehaviour
     public RoomCamera Camera;
     public RoomDoor[] ActiveDoors;
     public Transform SpawnTrasform;
+    public bool deletesave;
 
     public Dictionary<int, bool> SceneBools;
     public List<string> flags;
@@ -28,7 +29,10 @@ public class RoomManager : MonoBehaviour
     {
         roomTransitionHandlers = new List<OnRoomTransition>();
         if (flagChangeHandlers == null) flagChangeHandlers = new List<OnFlagsChanged>();
-        SaveSystem.DestroyData();
+        if (deletesave)
+        {
+            SaveSystem.DestroyData();
+        }
         RoomMap = new Dictionary<string, GameObject>();
         foreach (GameObject entry in Rooms) {
             RoomMap[entry.name] = entry;
