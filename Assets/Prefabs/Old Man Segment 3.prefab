@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 1184131789231373965}
   - component: {fileID: 1184131789231373962}
   m_Layer: 0
-  m_Name: Test Level 1
+  m_Name: Old Man Segment 3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1123,7 +1123,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: acb99151ba3194c0682bcac2c9d3f5c9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  RoomTo: Test Level 2
+  RoomTo: Bridge Segment 1
   DoorTo: Left Door
   EnterFrom: 3
 --- !u!1 &5207955280722697155
@@ -1307,7 +1307,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: acb99151ba3194c0682bcac2c9d3f5c9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  RoomTo: Test Level 5
+  RoomTo: Old Man Segment 2
   DoorTo: Right Door
   EnterFrom: 1
 --- !u!1 &7763214833894504991
