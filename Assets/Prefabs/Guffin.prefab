@@ -11,7 +11,8 @@ GameObject:
   - component: {fileID: 6367800494054577327}
   - component: {fileID: 6367800494054577320}
   - component: {fileID: 6367800494054577326}
-  - component: {fileID: 6367800494054577325}
+  - component: {fileID: 638171392034845967}
+  - component: {fileID: 5464274569239042203}
   m_Layer: 0
   m_Name: Guffin
   m_TagString: Untagged
@@ -109,7 +110,7 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.16, y: 0.16}
   m_EdgeRadius: 0
---- !u!114 &6367800494054577325
+--- !u!114 &638171392034845967
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -118,6 +119,31 @@ MonoBehaviour:
   m_GameObject: {fileID: 6367800494054577321}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 655193565b0eff1418215f25bc5798b7, type: 3}
+  m_Script: {fileID: 11500000, guid: 478537eb15b3c4a3497890c894788b02, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  flag: Vase 1
+--- !u!114 &5464274569239042203
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6367800494054577321}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 00cf4c83537ad41d684477328bf936ef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  interactions:
+  - flagNeeded: 
+    dialog:
+    - Speaker: You
+      Content: This is a piece of your heirloom vase!
+    - Speaker: You
+      Content: 'Why did they break it! '
+    reward: 
+    flagsSet:
+    - Winch Unknown
+    - Vase 1
+    flagsRemove: []

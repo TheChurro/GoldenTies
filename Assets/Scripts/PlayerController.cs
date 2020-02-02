@@ -30,11 +30,6 @@ public class PlayerController : MonoBehaviour
 
         HideDialog();
         hasInteraction = false;
-        if (flags == null) {
-            flags = new List<string>();
-            flags.Add("Winch Unknown");
-            flags.Add("rope");
-        }
         interactables = new List<Interactable>();
 
         MovementButtonPanel = GameObject.Find("Movement Panel");
@@ -79,7 +74,7 @@ public class PlayerController : MonoBehaviour
     private bool hasInteraction;
     private Interactable.Interaction interaction;
     private int dialogIndex;
-    public List<string> flags;
+    public RoomManager manager;
     void ShowDialog() {
         if (!DialogPanel.activeSelf) DialogPanel.SetActive(true);
         if (hasInteraction && 0 <= dialogIndex && dialogIndex < interaction.dialog.Length) {
@@ -98,7 +93,7 @@ public class PlayerController : MonoBehaviour
         if (!hasInteraction) {
             if (this.currentState != PlayerStates.Grounded) return false;
             if (interactables.Count == 0) return false;
-            var interactionIndex = interactables[0].GetInteraction(flags);
+            var interactionIndex = interactables[0].GetInteraction(manager.flags);
             consumeInput = interactionIndex != -1;
             if (consumeInput) {
                 InteractButtonText = "Interact";
@@ -126,12 +121,7 @@ public class PlayerController : MonoBehaviour
                 } else {
                     HideDialog();
                     hasInteraction = false;
-                    foreach (var flag in interaction.flagsSet) {
-                        flags.Add(flag);
-                    }
-                    foreach (var flag in interaction.flagsRemove) {
-                        flags.Remove(flag);
-                    }
+                    manager.ChangeFlags(interaction.flagsSet, interaction.flagsRemove);
                     this.currentState = this.movement.Grounded() ? PlayerStates.Grounded : PlayerStates.Aerial;
                 }
             }
@@ -150,12 +140,12 @@ public class PlayerController : MonoBehaviour
         if (this.movement.rb.velocity.magnitude > standingTolerance) return false;
         bool hasRope = stationAt.HasRope();
         if (!hasRope) {
-            if (!flags.Contains("rope")) return false;
+            if (!manager.flags.Contains("rope")) return false;
             consumeInput = true;
             InteractButtonText = "Place Rope";
             if (Input.GetButtonDown("Interact")) {
                 stationAt.MakeRope();
-                // TODO: Take the rope from the player.
+                manager.ChangeFlags(new string[]{}, new string[]{"rope"});
                 return true;
             }
         } else {
@@ -175,7 +165,7 @@ public class PlayerController : MonoBehaviour
                 stationAt.TakeRope();
                 // Remove any destroyed ropes.
                 overlappingRopes.RemoveAll((collider) => collider == null);
-                flags.Add("rope");
+                manager.ChangeFlags(new string[]{"rope"}, new string[]{});
                 return true;
             }
         }

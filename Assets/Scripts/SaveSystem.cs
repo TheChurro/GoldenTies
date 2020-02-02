@@ -4,13 +4,13 @@ using System.Runtime.Serialization.Formatters.Binary;
 
 public static class SaveSystem
 {
-    public static void Savegame(CeramicIndicator indicator, RoomManager manager)
+    public static void Savegame(RoomManager manager)
     {
         BinaryFormatter formatter = new BinaryFormatter();
         string path = Path.Combine(Application.persistentDataPath, "threadsave.gt");
         FileStream stream = new FileStream(path, FileMode.Create);
 
-        GameData data = new GameData(indicator, manager);
+        GameData data = new GameData(manager);
 
         formatter.Serialize(stream, data);
         stream.Close();
