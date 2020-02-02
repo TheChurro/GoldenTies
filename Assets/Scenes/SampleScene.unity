@@ -3091,7 +3091,7 @@ MonoBehaviour:
   cameraStaySize: {x: 3, y: 0.5}
   cameraRestoreSize: {x: 0.5, y: 0.25}
   cameraJumpSize: {x: 5, y: 5}
-  cameraMovementRate: 1
+  cameraMovementRate: 5
 --- !u!114 &1797891851
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3114,8 +3114,14 @@ MonoBehaviour:
   - name: Test Level 3
     RoomPrefab: {fileID: 5974179618962579700, guid: 2292e5b30c93b42cfbd1e698665cdcdd,
       type: 3}
+  - name: Test Level 4
+    RoomPrefab: {fileID: 1184131789231373963, guid: c687353cb54ad20449bdb00dd935d4e4,
+      type: 3}
+  - name: Test Level 5
+    RoomPrefab: {fileID: 1184131789231373963, guid: b0e123537cebc1e468baa4a40646dd38,
+      type: 3}
   collected: 
-  InitialRoom: Test Level 1
+  InitialRoom: Test Level 4
   ActiveRoom: {fileID: 0}
   ActiveRoomID: 
   PlayerPrefab: {fileID: 7384526842746157785, guid: ad984bbbdb1b24e08b3fb86a86003e42,

@@ -23,6 +23,8 @@ public class RoomCamera : MonoBehaviour
     public float cameraMovementRate;
     public void SetWorldBounds(Bounds NewBounds) {
         WorldBounds = NewBounds;
+        print("NEW BOUNDS: " + NewBounds);
+        print("World BOUNDS: " + WorldBounds);
         RecomputeCameraPositionBounds();
     }
 
@@ -37,6 +39,7 @@ public class RoomCamera : MonoBehaviour
 
     private void RecomputeCameraPositionBounds() {
         CameraWorldPositionBounds.center = WorldBounds.center;
+        print("Camera World Bounds Center: " + CameraWorldPositionBounds.center);
         var extents = WorldBounds.extents - ViewWorldBounds.extents;
         extents.x = Mathf.Max(0, extents.x);
         extents.y = Mathf.Max(0, extents.y);
@@ -96,15 +99,16 @@ public class RoomCamera : MonoBehaviour
     }
 
     void OnDrawGizmos() {
-        // Gizmos.color = Color.red;
-        // Gizmos.DrawWireCube(ViewWorldBounds.center, 2 * ViewWorldBounds.extents);
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireCube(ViewWorldBounds.center, 2 * ViewWorldBounds.extents);
         Gizmos.color = Color.green;
         Gizmos.DrawWireCube(WorldBounds.center, 2 * WorldBounds.extents);
-        // Gizmos.color = Color.blue;
-        // Gizmos.DrawWireCube(CameraWorldPositionBounds.center, 2 * CameraWorldPositionBounds.extents);
-        // Gizmos.color = Color.yellow;
-        // if (TrackingObject != null) {
-        //     Gizmos.DrawWireCube(GetClosestPositionInBoundsTo(TrackingObject.transform.position), new Vector3(0.5f, 0.5f, 0.5f));
-        // }
+        Gizmos.color = Color.blue;
+        Gizmos.DrawWireCube(CameraWorldPositionBounds.center, 2 * CameraWorldPositionBounds.extents);
+        Gizmos.color = Color.yellow;
+        if (TrackingObject != null)
+        {
+            Gizmos.DrawWireCube(GetClosestPositionInBoundsTo(TrackingObject.transform.position), new Vector3(0.5f, 0.5f, 0.5f));
+        }
     }
 }
