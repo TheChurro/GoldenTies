@@ -14,17 +14,21 @@ public class RoomManager : MonoBehaviour
         public GameObject RoomPrefab;
     }
     public RoomEntry[] Rooms;
+    public bool[] collected;
+
     public Dictionary<string, GameObject> RoomMap;
     public string InitialRoom;
     public GameObject ActiveRoom;
+    public string ActiveRoomID;
     public GameObject PlayerPrefab;
-    private GameObject ActivePlayer;
+    public GameObject ActivePlayer;
     public RoomCamera Camera;
     public RoomDoor[] ActiveDoors;
     public Transform SpawnTrasform;
     // Start is called before the first frame update
     void Start()
     {
+        SaveSystem.DestroyData();
         RoomMap = new Dictionary<string, GameObject>();
         foreach (RoomEntry entry in Rooms) {
             RoomMap[entry.name] = entry.RoomPrefab;
@@ -38,6 +42,10 @@ public class RoomManager : MonoBehaviour
         ActivePlayer = Instantiate(PlayerPrefab, SpawnTrasform.position, Quaternion.identity);
         Camera.TrackingObject = ActivePlayer;
         Camera.SetWorldBounds(GetBoundsOfActiveRoom());
+        ActiveRoomID = InitialRoom;
+
+        collected = new bool[1];
+        collected[0] = false;
     }
 
     private Bounds GetBoundsOfActiveRoom() {
@@ -85,8 +93,35 @@ public class RoomManager : MonoBehaviour
             }
             SpawnTrasform = roomToActivate.transform.Find("Player Spawn");
             Camera.SetWorldBounds(GetBoundsOfActiveRoom());
+            Camera.Track(ActivePlayer);
+            ActiveRoomID = newRoom;
         } else {
             print("No Room Named {" + newRoom + "} has been mapped!");
+        }
+    }
+
+    void Update()
+    { 
+        if (Input.GetKeyDown(KeyCode.G))
+        {
+            SaveSystem.Savegame(GameObject.Find("NumCeramics").GetComponent<CeramicIndicator>(), this);
+        }
+        if (Input.GetKeyDown(KeyCode.F2))
+        {
+            GameData data = SaveSystem.Loadgame();
+
+            Destroy(ActiveRoom);
+            ActiveRoom = Instantiate(RoomMap[data.activeroom]);
+            ActiveDoors = ActiveRoom.GetComponentsInChildren<RoomDoor>();
+            foreach (RoomDoor door in ActiveDoors)
+            {
+                door.Manager = this;
+            }
+            ActivePlayer.transform.position = new Vector3(data.playerposition[0], data.playerposition[1], data.playerposition[2]);
+            Camera.SetWorldBounds(GetBoundsOfActiveRoom());
+            Camera.Track(ActivePlayer);
+            var ceram = GameObject.Find("NumCeramics").GetComponent<CeramicIndicator>();
+            ceram.ceramicnumber = data.ceramics;
         }
     }
 }
