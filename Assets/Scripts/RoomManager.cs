@@ -134,6 +134,7 @@ public class RoomManager : MonoBehaviour
     }
     void BroadcastRoomTransition(bool willSave) {
         foreach (OnRoomTransition handler in roomTransitionHandlers) {
+            if (handler == null) continue;
             handler.OnRoomTransition(this, willSave);
         }
         roomTransitionHandlers.Clear();
