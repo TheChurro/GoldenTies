@@ -3152,8 +3152,9 @@ MonoBehaviour:
   - {fileID: 5974179618962579700, guid: 2292e5b30c93b42cfbd1e698665cdcdd, type: 3}
   - {fileID: 1184131789231373963, guid: c687353cb54ad20449bdb00dd935d4e4, type: 3}
   - {fileID: 1184131789231373963, guid: b0e123537cebc1e468baa4a40646dd38, type: 3}
+  - {fileID: 1184131789231373963, guid: 6bf215fe8423ea24d8081e1b6eb967d7, type: 3}
   collected: 
-  InitialRoom: Test Level 4
+  InitialRoom: Plats1
   ActiveRoom: {fileID: 0}
   ActiveRoomID: 
   PlayerPrefab: {fileID: 7384526842746157785, guid: ad984bbbdb1b24e08b3fb86a86003e42,
