@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 7384526842746157790}
   - component: {fileID: 7384526842746157791}
   - component: {fileID: 7384526842746157784}
+  - component: {fileID: 2574141532527676059}
   m_Layer: 8
   m_Name: Player
   m_TagString: Player
@@ -150,7 +151,6 @@ MonoBehaviour:
   col: {fileID: 7384526842746157790}
   gravitymin: 4
   gravitymax: 6
-  state: 0
   filter:
     useTriggers: 0
     useLayerMask: 1
@@ -166,3 +166,17 @@ MonoBehaviour:
     minNormalAngle: 0
     maxNormalAngle: 0
   contactTolerance: 0.3
+--- !u!114 &2574141532527676059
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7384526842746157785}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8528eb98c770c4c7c8860fdfd4935315, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  currentState: 0
+  standingTolerance: 0.01

@@ -23,7 +23,6 @@ public class RoomCamera : MonoBehaviour
     public float cameraMovementRate;
     public void SetWorldBounds(Bounds NewBounds) {
         WorldBounds = NewBounds;
-        print(WorldBounds);
         RecomputeCameraPositionBounds();
     }
 
