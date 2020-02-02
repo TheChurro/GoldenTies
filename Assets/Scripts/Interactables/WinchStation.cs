@@ -10,16 +10,24 @@ public class WinchStation : MonoBehaviour, OnRoomTransition
     public Rope rope;
     public float wenchRate;
     public float releaseRate;
+    public bool ownRope;
+    public int UID;
+    private bool hasRope;
     void Start() {
         var manager = FindObjectOfType<RoomManager>();
         if (manager != null) {
             manager.RegisterTransitionHandler(this);
+        }
+        if (ownRope) MakeRope();
+        if (!ownRope && manager.GetBool(UID)) {
+            MakeRope();
         }
     }
     public bool MakeRope() {
         if (rope == null) {
             var ropeObject = Instantiate(ropePrefab, ropeHangPoint.position, ropeHangPoint.rotation);
             rope = ropeObject.GetComponent<Rope>();
+            hasRope = true;
             return true;
         }
         return false;
@@ -29,6 +37,7 @@ public class WinchStation : MonoBehaviour, OnRoomTransition
         if (rope != null) {
             rope.Destroy();
             rope = null;
+            hasRope = false;
             return true;
         }
         return false;
@@ -51,6 +60,14 @@ public class WinchStation : MonoBehaviour, OnRoomTransition
     }
 
     public void OnRoomTransition(RoomManager manager, bool willSave) {
-        // TODO: Write to save data whether this object has a rope.
+        if (willSave && !ownRope && hasRope) {
+            manager.SetBool(UID, hasRope);
+        }
+    }
+
+    public void OnRoomSave(RoomManager manager) {
+        if (!ownRope && hasRope) {
+            manager.SetBool(UID, hasRope);
+        }
     }
 }

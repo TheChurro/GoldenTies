@@ -17,6 +17,7 @@ public class PlayerController : MonoBehaviour
     private PlayerMvmt movement;
     private WinchStation stationAt;
     public float standingTolerance;
+
     void Start() {
         movement = this.GetComponent<PlayerMvmt>();
         grabbingInWorldRope = false;
@@ -29,8 +30,11 @@ public class PlayerController : MonoBehaviour
 
         HideDialog();
         hasInteraction = false;
-        flags = new List<string>();
-        flags.Add("Winch Unknown");
+        if (flags == null) {
+            flags = new List<string>();
+            flags.Add("Winch Unknown");
+            flags.Add("rope");
+        }
         interactables = new List<Interactable>();
 
         MovementButtonPanel = GameObject.Find("Movement Panel");
@@ -75,7 +79,7 @@ public class PlayerController : MonoBehaviour
     private bool hasInteraction;
     private Interactable.Interaction interaction;
     private int dialogIndex;
-    private List<string> flags;
+    public List<string> flags;
     void ShowDialog() {
         if (!DialogPanel.activeSelf) DialogPanel.SetActive(true);
         if (hasInteraction && 0 <= dialogIndex && dialogIndex < interaction.dialog.Length) {
@@ -144,9 +148,10 @@ public class PlayerController : MonoBehaviour
         if (grabbingInWorldRope) return false;
         // We must be standing still (or approximately still) to use a winch.
         if (this.movement.rb.velocity.magnitude > standingTolerance) return false;
-        consumeInput = true;
         bool hasRope = stationAt.HasRope();
         if (!hasRope) {
+            if (!flags.Contains("rope")) return false;
+            consumeInput = true;
             InteractButtonText = "Place Rope";
             if (Input.GetButtonDown("Interact")) {
                 stationAt.MakeRope();
@@ -154,20 +159,23 @@ public class PlayerController : MonoBehaviour
                 return true;
             }
         } else {
+            consumeInput = true;
             WinchButtonText = "Wind";
             ReleaseButtonText = "Unwind";
-            InteractButtonText = "Remove Rope";
+            if (!stationAt.ownRope) {
+                InteractButtonText = "Remove Rope";
+            }
             if (Input.GetButton("Winch")) {
                 stationAt.Winch();
                 return true;
             } else if (Input.GetButton("Release")) {
                 stationAt.Release();
                 return true;
-            } else if (Input.GetButtonDown("Interact")) {
+            } else if (!stationAt.ownRope && Input.GetButtonDown("Interact")) {
                 stationAt.TakeRope();
                 // Remove any destroyed ropes.
                 overlappingRopes.RemoveAll((collider) => collider == null);
-                // TODO: Give the player the rope back.
+                flags.Add("rope");
                 return true;
             }
         }

@@ -250,14 +250,20 @@ public class Rope : MonoBehaviour, OnRoomTransition
             Destroy(endConnection);
         }
         foreach (var point in ropePoints) {
-            Destroy(point.gameObject);
+            if (point != null)
+                Destroy(point.gameObject);
         }
-        Destroy(this.gameObject);
+        if (this != null)
+            Destroy(this.gameObject);
     }
 
     public void OnRoomTransition(RoomManager manager, bool willSave) {
         this.Destroy();
     } 
+
+    public void OnRoomSave(RoomManager manager) {
+
+    }
 }
 
 public class RopeProxy : MonoBehaviour {
