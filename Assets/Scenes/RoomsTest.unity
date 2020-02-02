@@ -820,8 +820,10 @@ MonoBehaviour:
   - {fileID: 8085489852475644252, guid: cf0dde01668624b09aeab9f71478d3cf, type: 3}
   - {fileID: 8085489852475644252, guid: 900ba44e89c3e4bbdb2d6ff060909509, type: 3}
   - {fileID: 8085489852475644252, guid: f9f86db8bad514db1bb8aafe081857b7, type: 3}
+  - {fileID: 1184131789231373963, guid: 6bf215fe8423ea24d8081e1b6eb967d7, type: 3}
+  - {fileID: 1184131789231373963, guid: 83fbc0df958c642478e360bbfe9ab8dd, type: 3}
   collected: 
-  InitialRoom: Bridge Segment 2
+  InitialRoom: Old Man Segment 1
   ActiveRoom: {fileID: 0}
   ActiveRoomID: 
   PlayerPrefab: {fileID: 7384526842746157785, guid: ad984bbbdb1b24e08b3fb86a86003e42,

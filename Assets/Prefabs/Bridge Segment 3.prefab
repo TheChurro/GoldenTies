@@ -1427,7 +1427,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: acb99151ba3194c0682bcac2c9d3f5c9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  RoomTo: Bridge Segment 3
+  RoomTo: Plats1
   DoorTo: Left Door
   EnterFrom: 3
 --- !u!1 &4824990001304874241
