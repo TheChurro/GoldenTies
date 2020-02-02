@@ -13,27 +13,16 @@ public class PlayerMvmt : MonoBehaviour
     public BoxCollider2D col;
     public float gravitymin;
     public float gravitymax;
-
-    public enum states
-    {
-        grounded,
-        up,
-        down
-    }
-    public states state;
     public ContactFilter2D filter;
     public float contactTolerance;
 
     // Start is called before the first frame update
     void Start()
     {
-        state = states.grounded;
         jumpVelocity = -Physics2D.gravity.normalized * Mathf.Sqrt(2 * Physics2D.gravity.magnitude * gravitymin * jumpHeight);
     }
 
-    // Update is called once per frame
-    void Update()
-    {
+    public void HandleInput(bool grounded) {
         float translate = speed*Input.GetAxis("Horizontal");
         rb.velocity += new Vector2(translate, 0);
         if (rb.velocity.x > maxsp)
@@ -46,48 +35,29 @@ public class PlayerMvmt : MonoBehaviour
         }
 
         
-
-        switch (state)
-        {
-            case states.grounded:
-                if ((Input.GetAxis("Jump"))>0)
-                {
-                    rb.velocity += jumpVelocity;
-                    state = states.up;
-                }
-                else
-                {
-                    raycheck();
-                }
-                break;
-            case states.up:
-                if (Input.GetAxis("Jump")>0)
-                {
-                    rb.gravityScale = gravitymin;
-                }
-                else
-                {
-                    rb.gravityScale = gravitymax;
-                    state = states.down;
-                }
-                break;
-            case states.down:
-                raycheck();
-                break;
+        if (grounded) {
+            if (Input.GetButtonDown("Jump")) {
+                rb.velocity += jumpVelocity;
+                rb.gravityScale = gravitymin;
+            }
+        } else {
+            if (!Input.GetButton("Jump")) {
+                rb.gravityScale = gravitymax;
+            }
         }
+    }
 
-    void raycheck()
+    public bool Grounded()
+    {
+        List<RaycastHit2D> results = new List<RaycastHit2D>();
+        var result = Physics2D.BoxCast(rb.position, col.size, rb.rotation, new Vector2(0, -1), filter, results, contactTolerance);
+        if (result == 0)
         {
-            List<RaycastHit2D> results = new List<RaycastHit2D>();
-            var result = Physics2D.BoxCast(rb.position, col.size, rb.rotation, new Vector2(0, -1), filter, results, contactTolerance);
-            if (result == 0)
-            {
-                state = states.down;
-            }
-            else
-            {
-                state = states.grounded;
-            }
+            return false;
+        }
+        else
+        {
+            return true;
         }
     }
    
