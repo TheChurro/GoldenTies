@@ -9,7 +9,7 @@ public class McGuffin : MonoBehaviour
     void Start()
     {
         GameData data = SaveSystem.Loadgame();
-        if (data.collected[guffinindex])
+        if (data != null && data.collected[guffinindex])
         {
             Destroy(this.gameObject);
         }

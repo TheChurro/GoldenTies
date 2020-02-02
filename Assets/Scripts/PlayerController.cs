@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using TMPro;
 
 [RequireComponent(typeof(PlayerMvmt))]
 public class PlayerController : MonoBehaviour
@@ -22,6 +23,76 @@ public class PlayerController : MonoBehaviour
         ropeLayerMask = LayerMask.NameToLayer("RopeTrigger");
         overlappingRopes = new List<Collider2D>();
         overlappingWinchables = new List<WinchableObject>();
+        DialogPanel = GameObject.Find("Dialog");
+        SpeakerText = DialogPanel.transform.Find("Speaker").GetComponent<TextMeshProUGUI>();
+        ContentText = DialogPanel.transform.Find("Content").GetComponent<TextMeshProUGUI>();
+        HideDialog();
+        hasInteraction = false;
+        flags = new List<string>();
+        flags.Add("Winch Unknown");
+        interactables = new List<Interactable>();
+    }
+
+    private GameObject DialogPanel;
+    private TextMeshProUGUI SpeakerText;
+    private TextMeshProUGUI ContentText;
+    private List<Interactable> interactables;
+    private bool hasInteraction;
+    private Interactable.Interaction interaction;
+    private int dialogIndex;
+    private List<string> flags;
+    void ShowDialog() {
+        if (!DialogPanel.activeSelf) DialogPanel.SetActive(true);
+        if (hasInteraction && 0 <= dialogIndex && dialogIndex < interaction.dialog.Length) {
+            SpeakerText.text = interaction.dialog[dialogIndex].Speaker;
+            ContentText.text = interaction.dialog[dialogIndex].Content;
+        } else {
+            SpeakerText.text = "???";
+            ContentText.text = "???";
+        }
+    }
+    void HideDialog() {
+        DialogPanel.SetActive(false);
+    }
+    bool HandleDialog() {
+        if (!hasInteraction) {
+            if (this.currentState != PlayerStates.Grounded) return false;
+            if (interactables.Count == 0) return false;
+            if (Input.GetButtonDown("Interact")) {
+                print("Got button down!");
+                var interactionIndex = interactables[0].GetInteraction(flags);
+                if (interactionIndex != -1) {
+                    print("Got button down!");
+                    interaction = interactables[0].interactions[interactionIndex];
+                    hasInteraction = interaction.dialog.Length > 0;
+                    if (hasInteraction) {
+                        dialogIndex = 0;
+                        ShowDialog();
+                        this.currentState = PlayerStates.Dialog;
+                        return true;
+                    }
+                }
+            }
+            return false;
+        } else {
+            if (Input.GetButtonDown("Interact")) {
+                dialogIndex++;
+                if (dialogIndex < interaction.dialog.Length) {
+                    ShowDialog();
+                } else {
+                    HideDialog();
+                    hasInteraction = false;
+                    foreach (var flag in interaction.flagsSet) {
+                        flags.Add(flag);
+                    }
+                    foreach (var flag in interaction.flagsRemove) {
+                        flags.Remove(flag);
+                    }
+                    this.currentState = this.movement.Grounded() ? PlayerStates.Grounded : PlayerStates.Aerial;
+                }
+            }
+            return true;
+        }
     }
 
     // Returns whether using the winch consumed input. If true, then the winch was used
@@ -96,12 +167,12 @@ public class PlayerController : MonoBehaviour
     }
 
     void Update() {
-        // Handle dialog. This should always return at the end. 
-        if (currentState == PlayerStates.Dialog) {
-            return;
+        bool grounded = false;
+        if (this.currentState != PlayerStates.Dialog) {
+            grounded = this.movement.Grounded();
+            this.currentState = grounded ? PlayerStates.Grounded : PlayerStates.Aerial;
         }
-        bool grounded = this.movement.Grounded();
-        this.currentState = grounded ? PlayerStates.Grounded : PlayerStates.Aerial;
+        if (HandleDialog()) return;
         if (grounded) {
             if (UseWinch()) return;
         }
@@ -123,6 +194,11 @@ public class PlayerController : MonoBehaviour
         if (winchableProxy != null) {
             overlappingWinchables.Add(winchableProxy.obj);
         }
+        var interactable = collider.GetComponent<Interactable>();
+        if (interactable != null) {
+            print("Adding INteractable: " + interactable.name);
+            interactables.Add(interactable);
+        }
     }
 
     void OnTriggerExit2D(Collider2D collider) {
@@ -138,6 +214,10 @@ public class PlayerController : MonoBehaviour
         var winchableProxy = collider.GetComponent<WinchableProxy>();
         if (winchableProxy != null) {
             overlappingWinchables.Remove(winchableProxy.obj);
+        }
+        var interactable = collider.GetComponent<Interactable>();
+        if (interactable != null) {
+            interactables.Remove(interactable);
         }
     }
 }

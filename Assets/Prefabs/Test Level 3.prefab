@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 6273812131346485931}
   - component: {fileID: 8298664965929648142}
   - component: {fileID: 5099783596204846628}
+  - component: {fileID: 5764759004834355680}
   m_Layer: 0
   m_Name: Winch
   m_TagString: Untagged
@@ -128,6 +129,29 @@ MonoBehaviour:
   rope: {fileID: 0}
   wenchRate: 0.5
   releaseRate: 1
+--- !u!114 &5764759004834355680
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2536914043242730936}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 00cf4c83537ad41d684477328bf936ef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  interactions:
+  - flagNeeded: Winch Unknown
+    dialog:
+    - Speaker: You
+      Content: Seems like this winch can let out rope.
+    - Speaker: You
+      Content: I wonder if it can haul that rock over?
+    reward: 
+    flagsSet: []
+    flagsRemove:
+    - Winch Unknown
 --- !u!1 &5974179618962579700
 GameObject:
   m_ObjectHideFlags: 0
@@ -2952,7 +2976,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8681794328283306437}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2.25, y: -0.5, z: 0}
+  m_LocalPosition: {x: -2.52, y: -0.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 181171793090252933}
