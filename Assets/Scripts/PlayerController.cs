@@ -48,6 +48,7 @@ public class PlayerController : MonoBehaviour
     private TextMeshProUGUI ReleaseButtonDisplay;
     private TextMeshProUGUI InteractButtonDisplay;
     private GameObject MovementButtonPanel;
+    public Animator animator;
     void UpdateDisplay(TextMeshProUGUI gui, string text, ref bool didDisplay) {
         if (text == null) {
             if (gui.gameObject.activeSelf) gui.gameObject.SetActive(false);
@@ -75,6 +76,7 @@ public class PlayerController : MonoBehaviour
     private Interactable.Interaction interaction;
     private int dialogIndex;
     public RoomManager manager;
+    public SpriteRenderer renderer;
     void ShowDialog() {
         if (!DialogPanel.activeSelf) DialogPanel.SetActive(true);
         if (hasInteraction && 0 <= dialogIndex && dialogIndex < interaction.dialog.Length) {
@@ -240,6 +242,12 @@ public class PlayerController : MonoBehaviour
         if (HandleRope(ref consumeInput)) return;
         movement.HandleInput(grounded);
         UpdateUIControlsDisplay();
+        animator.SetFloat("XSpeed", movement.rb.velocity.magnitude);
+        if (Input.GetAxis("Horizontal") > 0) {
+            renderer.flipX = true;
+        } else if (Input.GetAxis("Horizontal") < 0) {
+            renderer.flipX = false;
+        }
     }
 
     void OnTriggerEnter2D(Collider2D collider) {
