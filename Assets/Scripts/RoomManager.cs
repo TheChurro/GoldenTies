@@ -8,12 +8,7 @@ using UnityEngine.Tilemaps;
 // the grid of objects and make sure to move the player to the correct door in the new room.
 public class RoomManager : MonoBehaviour
 {
-    [System.Serializable]
-    public struct RoomEntry {
-        public string name;
-        public GameObject RoomPrefab;
-    }
-    public RoomEntry[] Rooms;
+    public GameObject[] Rooms;
     public bool[] collected;
 
     public Dictionary<string, GameObject> RoomMap;
@@ -27,14 +22,16 @@ public class RoomManager : MonoBehaviour
     public Transform SpawnTrasform;
 
     public Dictionary<int, bool> SceneBools;
+    public List<string> flags;
     // Start is called before the first frame update
     void Start()
     {
         roomTransitionHandlers = new List<OnRoomTransition>();
-        // SaveSystem.DestroyData();
+        if (flagChangeHandlers == null) flagChangeHandlers = new List<OnFlagsChanged>();
+        SaveSystem.DestroyData();
         RoomMap = new Dictionary<string, GameObject>();
-        foreach (RoomEntry entry in Rooms) {
-            RoomMap[entry.name] = entry.RoomPrefab;
+        foreach (GameObject entry in Rooms) {
+            RoomMap[entry.name] = entry;
         }
         ActiveRoom = Instantiate(RoomMap[InitialRoom]);
         ActiveDoors = ActiveRoom.GetComponentsInChildren<RoomDoor>();
@@ -46,10 +43,12 @@ public class RoomManager : MonoBehaviour
         Camera.TrackingObject = ActivePlayer;
         Camera.SetWorldBounds(GetBoundsOfActiveRoom());
         ActiveRoomID = InitialRoom;
+        ActivePlayer.GetComponent<PlayerController>().manager = this;
 
         collected = new bool[1];
         collected[0] = false;
         SceneBools = new Dictionary<int, bool>();
+
         LoadGame();
     }
 
@@ -101,7 +100,7 @@ public class RoomManager : MonoBehaviour
             Camera.SetWorldBounds(GetBoundsOfActiveRoom());
             Camera.Track(ActivePlayer);
             ActiveRoomID = newRoom;
-            SaveSystem.Savegame(GameObject.Find("NumCeramics").GetComponent<CeramicIndicator>(), this);
+            SaveSystem.Savegame(this);
         } else {
             print("No Room Named {" + newRoom + "} has been mapped!");
         }
@@ -112,7 +111,7 @@ public class RoomManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.G))
         {
             BroadcastRoomSave();
-            SaveSystem.Savegame(GameObject.Find("NumCeramics").GetComponent<CeramicIndicator>(), this);
+            SaveSystem.Savegame(this);
         }
         if (Input.GetKeyDown(KeyCode.F2))
         {
@@ -133,12 +132,10 @@ public class RoomManager : MonoBehaviour
         }
         ActivePlayer.transform.position = new Vector3(data.playerposition[0], data.playerposition[1], data.playerposition[2]);
         var controller = ActivePlayer.GetComponent<PlayerController>();
-        controller.flags.Clear();
-        controller.flags.AddRange(data.flags);
+        this.flags.Clear();
+        this.flags.AddRange(data.flags);
         Camera.SetWorldBounds(GetBoundsOfActiveRoom());
         Camera.Track(ActivePlayer);
-        var ceram = GameObject.Find("NumCeramics").GetComponent<CeramicIndicator>();
-        ceram.ceramicnumber = data.ceramics;
         SceneBools = new Dictionary<int, bool>();
         for (int i = 0; i < data.boolStorageUID.Length; i++) {
             SceneBools[data.boolStorageUID[i]] = data.boolStorageVals[i];
@@ -163,6 +160,30 @@ public class RoomManager : MonoBehaviour
         roomTransitionHandlers.Clear();
     }
 
+    private List<OnFlagsChanged> flagChangeHandlers;
+    public void ChangeFlags(string[] newFlags, string[] removeFlags) {
+        if (this.flags == null) this.flags = new List<string>();
+        HashSet<string> lFlags = new HashSet<string>();
+        lFlags.UnionWith(removeFlags);
+        foreach (var flag in newFlags) {
+            this.flags.Add(flag);
+        }
+        this.flags.RemoveAll((x) => lFlags.Contains(x));
+        BroadcastFlagsChanged();
+    }
+    public void RegisterFlagsChangedHandler(OnFlagsChanged handler) {
+        if (flagChangeHandlers == null) flagChangeHandlers = new List<OnFlagsChanged>();
+        flagChangeHandlers.Add(handler);
+    }
+    void BroadcastFlagsChanged() {
+        List<OnFlagsChanged> toRemove = new List<OnFlagsChanged>();
+        flagChangeHandlers.RemoveAll((x) => x == null);
+        foreach (var handler in flagChangeHandlers) {
+            if (handler == null) continue;
+            handler.FlagsChanged(this);
+        }
+    }
+
     public bool GetBool(int objectUID) {
         if (SceneBools.TryGetValue(objectUID, out bool val)) {
             return val;
@@ -179,4 +200,8 @@ public class RoomManager : MonoBehaviour
 public interface OnRoomTransition {
     void OnRoomTransition(RoomManager manager, bool willSave);
     void OnRoomSave(RoomManager manager);
+}
+
+public interface OnFlagsChanged {
+    void FlagsChanged(RoomManager manager);
 }
