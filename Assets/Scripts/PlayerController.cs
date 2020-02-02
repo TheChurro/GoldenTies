@@ -17,6 +17,7 @@ public class PlayerController : MonoBehaviour
     private PlayerMvmt movement;
     private WinchStation stationAt;
     public float standingTolerance;
+
     void Start() {
         movement = this.GetComponent<PlayerMvmt>();
         grabbingInWorldRope = false;
@@ -29,8 +30,10 @@ public class PlayerController : MonoBehaviour
 
         HideDialog();
         hasInteraction = false;
-        flags = new List<string>();
-        flags.Add("Winch Unknown");
+        if (flags == null) {
+            flags = new List<string>();
+            flags.Add("Winch Unknown");
+        }
         interactables = new List<Interactable>();
 
         MovementButtonPanel = GameObject.Find("Movement Panel");
@@ -75,7 +78,7 @@ public class PlayerController : MonoBehaviour
     private bool hasInteraction;
     private Interactable.Interaction interaction;
     private int dialogIndex;
-    private List<string> flags;
+    public List<string> flags;
     void ShowDialog() {
         if (!DialogPanel.activeSelf) DialogPanel.SetActive(true);
         if (hasInteraction && 0 <= dialogIndex && dialogIndex < interaction.dialog.Length) {

@@ -250,7 +250,8 @@ public class Rope : MonoBehaviour, OnRoomTransition
             Destroy(endConnection);
         }
         foreach (var point in ropePoints) {
-            Destroy(point.gameObject);
+            if (point != null)
+                Destroy(point.gameObject);
         }
         Destroy(this.gameObject);
     }

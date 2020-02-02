@@ -29,7 +29,7 @@ public class RoomManager : MonoBehaviour
     void Start()
     {
         roomTransitionHandlers = new List<OnRoomTransition>();
-        SaveSystem.DestroyData();
+        // SaveSystem.DestroyData();
         RoomMap = new Dictionary<string, GameObject>();
         foreach (RoomEntry entry in Rooms) {
             RoomMap[entry.name] = entry.RoomPrefab;
@@ -47,6 +47,7 @@ public class RoomManager : MonoBehaviour
 
         collected = new bool[1];
         collected[0] = false;
+        LoadGame();
     }
 
     private Bounds GetBoundsOfActiveRoom() {
@@ -97,6 +98,7 @@ public class RoomManager : MonoBehaviour
             Camera.SetWorldBounds(GetBoundsOfActiveRoom());
             Camera.Track(ActivePlayer);
             ActiveRoomID = newRoom;
+            SaveSystem.Savegame(GameObject.Find("NumCeramics").GetComponent<CeramicIndicator>(), this);
         } else {
             print("No Room Named {" + newRoom + "} has been mapped!");
         }
@@ -110,22 +112,29 @@ public class RoomManager : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.F2))
         {
-            BroadcastRoomTransition(false);
-            GameData data = SaveSystem.Loadgame();
-
-            Destroy(ActiveRoom);
-            ActiveRoom = Instantiate(RoomMap[data.activeroom]);
-            ActiveDoors = ActiveRoom.GetComponentsInChildren<RoomDoor>();
-            foreach (RoomDoor door in ActiveDoors)
-            {
-                door.Manager = this;
-            }
-            ActivePlayer.transform.position = new Vector3(data.playerposition[0], data.playerposition[1], data.playerposition[2]);
-            Camera.SetWorldBounds(GetBoundsOfActiveRoom());
-            Camera.Track(ActivePlayer);
-            var ceram = GameObject.Find("NumCeramics").GetComponent<CeramicIndicator>();
-            ceram.ceramicnumber = data.ceramics;
+            LoadGame();
         }
+    }
+
+    void LoadGame() {
+        GameData data = SaveSystem.Loadgame();
+        if (data == null) return;
+        BroadcastRoomTransition(false);
+        Destroy(ActiveRoom);
+        ActiveRoom = Instantiate(RoomMap[data.activeroom]);
+        ActiveDoors = ActiveRoom.GetComponentsInChildren<RoomDoor>();
+        foreach (RoomDoor door in ActiveDoors)
+        {
+            door.Manager = this;
+        }
+        ActivePlayer.transform.position = new Vector3(data.playerposition[0], data.playerposition[1], data.playerposition[2]);
+        var controller = ActivePlayer.GetComponent<PlayerController>();
+        controller.flags.Clear();
+        controller.flags.AddRange(data.flags);
+        Camera.SetWorldBounds(GetBoundsOfActiveRoom());
+        Camera.Track(ActivePlayer);
+        var ceram = GameObject.Find("NumCeramics").GetComponent<CeramicIndicator>();
+        ceram.ceramicnumber = data.ceramics;
     }
 
     private List<OnRoomTransition> roomTransitionHandlers;
