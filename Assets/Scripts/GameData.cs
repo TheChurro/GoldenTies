@@ -10,6 +10,8 @@ public class GameData
     public string activeroom;
     public bool[] collected;
     public string[] flags;
+    public int[] boolStorageUID;
+    public bool[] boolStorageVals;
 
     public GameData(CeramicIndicator indicator,RoomManager manager) 
     {
@@ -26,6 +28,14 @@ public class GameData
         collected[0] = manager.collected[0];
 
         flags = manager.ActivePlayer.GetComponent<PlayerController>().flags.ToArray();
+        boolStorageUID = new int[manager.SceneBools.Count];
+        boolStorageVals = new bool[manager.SceneBools.Count];
+        int i = 0;
+        foreach (var kvp in manager.SceneBools) {
+            boolStorageUID[i] = kvp.Key;
+            boolStorageVals[i] = kvp.Value;
+            i++;
+        }
     }
 
 }

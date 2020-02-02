@@ -25,6 +25,8 @@ public class RoomManager : MonoBehaviour
     public RoomCamera Camera;
     public RoomDoor[] ActiveDoors;
     public Transform SpawnTrasform;
+
+    public Dictionary<int, bool> SceneBools;
     // Start is called before the first frame update
     void Start()
     {
@@ -47,6 +49,7 @@ public class RoomManager : MonoBehaviour
 
         collected = new bool[1];
         collected[0] = false;
+        SceneBools = new Dictionary<int, bool>();
         LoadGame();
     }
 
@@ -108,6 +111,7 @@ public class RoomManager : MonoBehaviour
     { 
         if (Input.GetKeyDown(KeyCode.G))
         {
+            BroadcastRoomSave();
             SaveSystem.Savegame(GameObject.Find("NumCeramics").GetComponent<CeramicIndicator>(), this);
         }
         if (Input.GetKeyDown(KeyCode.F2))
@@ -135,11 +139,21 @@ public class RoomManager : MonoBehaviour
         Camera.Track(ActivePlayer);
         var ceram = GameObject.Find("NumCeramics").GetComponent<CeramicIndicator>();
         ceram.ceramicnumber = data.ceramics;
+        SceneBools = new Dictionary<int, bool>();
+        for (int i = 0; i < data.boolStorageUID.Length; i++) {
+            SceneBools[data.boolStorageUID[i]] = data.boolStorageVals[i];
+        }
     }
 
     private List<OnRoomTransition> roomTransitionHandlers;
     public void RegisterTransitionHandler(OnRoomTransition handler) {
         roomTransitionHandlers.Add(handler);
+    }
+    void BroadcastRoomSave() {
+        foreach (OnRoomTransition handler in roomTransitionHandlers) {
+            if (handler == null) continue;
+            handler.OnRoomSave(this);
+        }
     }
     void BroadcastRoomTransition(bool willSave) {
         foreach (OnRoomTransition handler in roomTransitionHandlers) {
@@ -148,8 +162,21 @@ public class RoomManager : MonoBehaviour
         }
         roomTransitionHandlers.Clear();
     }
+
+    public bool GetBool(int objectUID) {
+        if (SceneBools.TryGetValue(objectUID, out bool val)) {
+            return val;
+        }
+        SceneBools[objectUID] = false;
+        return false;
+    }
+
+    public void SetBool(int objectUID, bool val) {
+        SceneBools[objectUID] = val;
+    }
 }
 
 public interface OnRoomTransition {
     void OnRoomTransition(RoomManager manager, bool willSave);
+    void OnRoomSave(RoomManager manager);
 }
