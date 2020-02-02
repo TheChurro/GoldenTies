@@ -37,6 +37,16 @@ public class RoomManager : MonoBehaviour
         SpawnTrasform = ActiveRoom.transform.Find("Player Spawn");
         ActivePlayer = Instantiate(PlayerPrefab, SpawnTrasform.position, Quaternion.identity);
         Camera.TrackingObject = ActivePlayer;
+        Camera.SetWorldBounds(GetBoundsOfActiveRoom());
+    }
+
+    private Bounds GetBoundsOfActiveRoom() {
+        var tiles = ActiveRoom.GetComponentInChildren<Tilemap>();
+        var min = tiles.transform.TransformPoint(tiles.localBounds.min);
+        var max = tiles.transform.TransformPoint(tiles.localBounds.max);
+        var bounds = new Bounds();
+        bounds.SetMinMax(min, max);
+        return bounds;
     }
 
     public void ChangeRoom(string newRoom, string targetDoor) {
@@ -74,6 +84,7 @@ public class RoomManager : MonoBehaviour
                 Camera.TrackingObject = ActivePlayer;
             }
             SpawnTrasform = roomToActivate.transform.Find("Player Spawn");
+            Camera.SetWorldBounds(GetBoundsOfActiveRoom());
         } else {
             print("No Room Named {" + newRoom + "} has been mapped!");
         }

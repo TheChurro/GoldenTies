@@ -2819,6 +2819,7 @@ GameObject:
   - component: {fileID: 1705133186}
   - component: {fileID: 1705133185}
   - component: {fileID: 1705133188}
+  - component: {fileID: 1705133189}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -2914,9 +2915,34 @@ MonoBehaviour:
   ActiveRoom: {fileID: 0}
   PlayerPrefab: {fileID: 7384526842746157785, guid: ad984bbbdb1b24e08b3fb86a86003e42,
     type: 3}
-  Camera: {fileID: 0}
+  Camera: {fileID: 1705133189}
   ActiveDoors: []
   SpawnTrasform: {fileID: 0}
+--- !u!114 &1705133189
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1705133184}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0f6abf894a28342e3b859317e3a90c1a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  UIContainer: {fileID: 711859398}
+  camera: {fileID: 1705133186}
+  ViewBounds:
+    m_Center: {x: 0, y: 0, z: 0}
+    m_Extent: {x: 0, y: 0, z: 0}
+  WorldBounds:
+    m_Center: {x: 0, y: 0, z: 0}
+    m_Extent: {x: 0, y: 0, z: 0}
+  TrackingObject: {fileID: 0}
+  cameraStaySize: {x: 3, y: 0.5}
+  cameraRestoreSize: {x: 0.5, y: 0.25}
+  cameraJumpSize: {x: 5, y: 5}
+  cameraMovementRate: 1
 --- !u!1 &1969076816
 GameObject:
   m_ObjectHideFlags: 0
