@@ -25,13 +25,17 @@ public class RoomManager : MonoBehaviour
     public RoomCamera Camera;
     public RoomDoor[] ActiveDoors;
     public Transform SpawnTrasform;
+    public bool deletesave;
 
     public Dictionary<int, bool> SceneBools;
     // Start is called before the first frame update
     void Start()
     {
         roomTransitionHandlers = new List<OnRoomTransition>();
-        // SaveSystem.DestroyData();
+        if (deletesave)
+        {
+            SaveSystem.DestroyData();
+        }
         RoomMap = new Dictionary<string, GameObject>();
         foreach (RoomEntry entry in Rooms) {
             RoomMap[entry.name] = entry.RoomPrefab;
