@@ -818,9 +818,9 @@ MonoBehaviour:
   - {fileID: 1184131789231373963, guid: b0e123537cebc1e468baa4a40646dd38, type: 3}
   - {fileID: 1184131789231373963, guid: 15a385ddbed7d45e4a417cdbfb5aca5b, type: 3}
   - {fileID: 8085489852475644252, guid: cf0dde01668624b09aeab9f71478d3cf, type: 3}
-  - {fileID: 5974179618962579700, guid: 2292e5b30c93b42cfbd1e698665cdcdd, type: 3}
+  - {fileID: 8085489852475644252, guid: 900ba44e89c3e4bbdb2d6ff060909509, type: 3}
   collected: 
-  InitialRoom: Old Man Segment 1
+  InitialRoom: Bridge Segment 2
   ActiveRoom: {fileID: 0}
   ActiveRoomID: 
   PlayerPrefab: {fileID: 7384526842746157785, guid: ad984bbbdb1b24e08b3fb86a86003e42,
@@ -1031,7 +1031,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 50, y: 0}
-  m_SizeDelta: {x: 72, y: 72}
+  m_SizeDelta: {x: 50, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &572449690
 MonoBehaviour:
@@ -1051,7 +1051,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 21300000, guid: 2364b3b4ef59d41468c69790d3495dc0, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -2898,7 +2898,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 147, y: 0}
-  m_SizeDelta: {x: 72, y: 72}
+  m_SizeDelta: {x: 50, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1939520868
 MonoBehaviour:
@@ -2918,7 +2918,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 21300000, guid: 91d0ed67b622e485d97178b6006534fb, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
