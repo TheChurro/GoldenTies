@@ -26,11 +26,46 @@ public class PlayerController : MonoBehaviour
         DialogPanel = GameObject.Find("Dialog");
         SpeakerText = DialogPanel.transform.Find("Speaker").GetComponent<TextMeshProUGUI>();
         ContentText = DialogPanel.transform.Find("Content").GetComponent<TextMeshProUGUI>();
+
         HideDialog();
         hasInteraction = false;
         flags = new List<string>();
         flags.Add("Winch Unknown");
         interactables = new List<Interactable>();
+
+        MovementButtonPanel = GameObject.Find("Movement Panel");
+        WinchButtonDisplay = GameObject.Find("Winch Action").GetComponent<TextMeshProUGUI>();
+        ReleaseButtonDisplay = GameObject.Find("Release Action").GetComponent<TextMeshProUGUI>();
+        InteractButtonDisplay = GameObject.Find("Interact Action").GetComponent<TextMeshProUGUI>();
+        WinchButtonText = null;
+        ReleaseButtonText = null;
+        InteractButtonText = null;
+    }
+
+    private string WinchButtonText;
+    private string ReleaseButtonText;
+    private string InteractButtonText;
+    private TextMeshProUGUI WinchButtonDisplay;
+    private TextMeshProUGUI ReleaseButtonDisplay;
+    private TextMeshProUGUI InteractButtonDisplay;
+    private GameObject MovementButtonPanel;
+    void UpdateDisplay(TextMeshProUGUI gui, string text, ref bool didDisplay) {
+        if (text == null) {
+            if (gui.gameObject.activeSelf) gui.gameObject.SetActive(false);
+        } else {
+            if (!gui.gameObject.activeSelf) gui.gameObject.SetActive(true);
+            gui.text = text;
+            didDisplay = true;
+        }
+    }
+    void UpdateUIControlsDisplay() {
+        bool hasSpecificDisplay = false;
+        UpdateDisplay(WinchButtonDisplay, WinchButtonText, ref hasSpecificDisplay);
+        UpdateDisplay(ReleaseButtonDisplay, ReleaseButtonText, ref hasSpecificDisplay);
+        UpdateDisplay(InteractButtonDisplay, InteractButtonText, ref hasSpecificDisplay);
+        if (MovementButtonPanel.activeSelf == hasSpecificDisplay) {
+            MovementButtonPanel.SetActive(!hasSpecificDisplay);
+        }
     }
 
     private GameObject DialogPanel;
@@ -54,15 +89,18 @@ public class PlayerController : MonoBehaviour
     void HideDialog() {
         DialogPanel.SetActive(false);
     }
-    bool HandleDialog() {
+    bool HandleDialog(ref bool consumeInput) {
+        if (consumeInput) return false;
         if (!hasInteraction) {
             if (this.currentState != PlayerStates.Grounded) return false;
             if (interactables.Count == 0) return false;
+            var interactionIndex = interactables[0].GetInteraction(flags);
+            consumeInput = interactionIndex != -1;
+            if (consumeInput) {
+                InteractButtonText = "Interact";
+            }
             if (Input.GetButtonDown("Interact")) {
-                print("Got button down!");
-                var interactionIndex = interactables[0].GetInteraction(flags);
                 if (interactionIndex != -1) {
-                    print("Got button down!");
                     interaction = interactables[0].interactions[interactionIndex];
                     hasInteraction = interaction.dialog.Length > 0;
                     if (hasInteraction) {
@@ -75,6 +113,8 @@ public class PlayerController : MonoBehaviour
             }
             return false;
         } else {
+            consumeInput = true;
+            InteractButtonText = "Continue";
             if (Input.GetButtonDown("Interact")) {
                 dialogIndex++;
                 if (dialogIndex < interaction.dialog.Length) {
@@ -97,20 +137,26 @@ public class PlayerController : MonoBehaviour
 
     // Returns whether using the winch consumed input. If true, then the winch was used
     // and no otehr input should be processed.
-    bool UseWinch() {
+    bool UseWinch(ref bool consumeInput) {
+        if (consumeInput) return false;
         // We must be at a WinchStation to use a winch.
         if (stationAt == null) return false;
         if (grabbingInWorldRope) return false;
         // We must be standing still (or approximately still) to use a winch.
         if (this.movement.rb.velocity.magnitude > standingTolerance) return false;
+        consumeInput = true;
         bool hasRope = stationAt.HasRope();
         if (!hasRope) {
+            InteractButtonText = "Place Rope";
             if (Input.GetButtonDown("Interact")) {
                 stationAt.MakeRope();
                 // TODO: Take the rope from the player.
                 return true;
             }
         } else {
+            WinchButtonText = "Wind";
+            ReleaseButtonText = "Unwind";
+            InteractButtonText = "Remove Rope";
             if (Input.GetButton("Winch")) {
                 stationAt.Winch();
                 return true;
@@ -134,11 +180,24 @@ public class PlayerController : MonoBehaviour
     private int ropeLayerMask;
     private FixedJoint2D ropeJoint;
     private RopeProxy proxy;
-    bool HandleRope() {
+    bool HandleRope(ref bool consumeInput) {
+        if (consumeInput) return false;
         if (ropeJoint == null) {
             grabbingInWorldRope = false;
             ropeJoint = null;
             proxy = null;
+        }
+        consumeInput = grabbingInWorldRope || overlappingRopes.Count > 0;
+        if (consumeInput) {
+            if (grabbingInWorldRope) {
+                if (overlappingWinchables.Count != 0) {
+                    InteractButtonText = "Attach Rope";
+                } else {
+                    InteractButtonText = "Drop Rope";
+                }
+            } else {
+                InteractButtonText = "Grab Rope";
+            }
         }
         if (Input.GetButtonDown("Interact")) {
             // If we are grabbing a rope, release it.
@@ -172,12 +231,17 @@ public class PlayerController : MonoBehaviour
             grounded = this.movement.Grounded();
             this.currentState = grounded ? PlayerStates.Grounded : PlayerStates.Aerial;
         }
-        if (HandleDialog()) return;
+        WinchButtonText = null;
+        ReleaseButtonText = null;
+        InteractButtonText = null;
+        bool consumeInput = false;
+        if (HandleDialog(ref consumeInput)) return;
         if (grounded) {
-            if (UseWinch()) return;
+            if (UseWinch(ref consumeInput)) return;
         }
-        if (HandleRope()) return;
+        if (HandleRope(ref consumeInput)) return;
         movement.HandleInput(grounded);
+        UpdateUIControlsDisplay();
     }
 
     void OnTriggerEnter2D(Collider2D collider) {
@@ -196,7 +260,6 @@ public class PlayerController : MonoBehaviour
         }
         var interactable = collider.GetComponent<Interactable>();
         if (interactable != null) {
-            print("Adding INteractable: " + interactable.name);
             interactables.Add(interactable);
         }
     }
