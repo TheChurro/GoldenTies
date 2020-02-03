@@ -59,3 +59,6 @@ sysinfo.txt
 crashlytics-build.properties
 
 Assets/Sprites/repaired pottery.png.meta
+
+#mac files
+*.DS_Store
