@@ -4,7 +4,7 @@ using UnityEngine;
 using System;
 using TMPro;
 
-[RequireComponent(typeof(PlayerMvmt))]
+[RequireComponent(typeof(MovementController))]
 public class PlayerController : MonoBehaviour
 {
     public enum PlayerStates {
@@ -14,12 +14,12 @@ public class PlayerController : MonoBehaviour
     }
     public PlayerStates currentState;
 
-    private PlayerMvmt movement;
+    private MovementController movement;
     private WinchStation stationAt;
     public float standingTolerance;
 
     void Start() {
-        movement = this.GetComponent<PlayerMvmt>();
+        movement = this.GetComponent<MovementController>();
         grabbingInWorldRope = false;
         ropeLayerMask = LayerMask.NameToLayer("RopeTrigger");
         overlappingRopes = new List<Collider2D>();
