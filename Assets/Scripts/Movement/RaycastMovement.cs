@@ -108,3 +108,13 @@ public struct RaycastBoundaryLine {
     public Vector2 displacement;
     public int numRays;
 }
+
+public static class RaycastBoundarySideExtensions {
+    public static bool IsHorizontal(this RaycastBoundarySide side) {
+        return side == RaycastBoundarySide.Left || side == RaycastBoundarySide.Right;
+    }
+
+    public static bool IsVertical(this RaycastBoundarySide side) {
+        return side == RaycastBoundarySide.Top || side == RaycastBoundarySide.Bottom;
+    }
+}

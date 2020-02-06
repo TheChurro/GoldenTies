@@ -4,7 +4,7 @@ using UnityEngine;
 using System;
 using TMPro;
 
-[RequireComponent(typeof(MovementController))]
+[RequireComponent(typeof(PlayerPhysics))]
 public class PlayerController : MonoBehaviour
 {
     public enum PlayerStates {
@@ -14,12 +14,12 @@ public class PlayerController : MonoBehaviour
     }
     public PlayerStates currentState;
 
-    private MovementController movement;
+    private PlayerPhysics movement;
     private WinchStation stationAt;
     public float standingTolerance;
 
     void Start() {
-        movement = this.GetComponent<MovementController>();
+        movement = this.GetComponent<PlayerPhysics>();
         grabbingInWorldRope = false;
         ropeLayerMask = LayerMask.NameToLayer("RopeTrigger");
         overlappingRopes = new List<Collider2D>();
@@ -124,7 +124,7 @@ public class PlayerController : MonoBehaviour
                     HideDialog();
                     hasInteraction = false;
                     manager.ChangeFlags(interaction.flagsSet, interaction.flagsRemove);
-                    this.currentState = this.movement.Grounded() ? PlayerStates.Grounded : PlayerStates.Aerial;
+                    this.currentState = this.movement.UpdateGrounded() ? PlayerStates.Grounded : PlayerStates.Aerial;
                 }
             }
             return true;
@@ -139,7 +139,7 @@ public class PlayerController : MonoBehaviour
         if (stationAt == null) return false;
         if (grabbingInWorldRope) return false;
         // We must be standing still (or approximately still) to use a winch.
-        if (this.movement.rb.velocity.magnitude > standingTolerance) return false;
+        if (this.movement.currentVelocity.magnitude > standingTolerance) return false;
         bool hasRope = stationAt.HasRope();
         if (!hasRope) {
             if (!manager.flags.Contains("rope")) return false;
@@ -212,14 +212,14 @@ public class PlayerController : MonoBehaviour
             // Otherwise, check to see if we are overlapping a rope (and 
             // therefore can grab said rope.)
             } else if (overlappingRopes.Count > 0) {
-                var connectingBody = overlappingRopes[0].transform.parent.gameObject;
-                proxy = overlappingRopes[0].GetComponent<RopeProxy>();
-                ropeJoint = connectingBody.AddComponent<FixedJoint2D>();
-                ropeJoint.autoConfigureConnectedAnchor = false;
-                ropeJoint.connectedBody = this.movement.rb;
-                ropeJoint.anchor = Vector2.zero;
-                ropeJoint.connectedAnchor = Vector2.zero;
-                grabbingInWorldRope = true;
+                // var connectingBody = overlappingRopes[0].transform.parent.gameObject;
+                // proxy = overlappingRopes[0].GetComponent<RopeProxy>();
+                // ropeJoint = connectingBody.AddComponent<FixedJoint2D>();
+                // ropeJoint.autoConfigureConnectedAnchor = false;
+                // ropeJoint.connectedBody = this.movement.rb;
+                // ropeJoint.anchor = Vector2.zero;
+                // ropeJoint.connectedAnchor = Vector2.zero;
+                // grabbingInWorldRope = true;
             }
         }
         return false;
@@ -228,7 +228,7 @@ public class PlayerController : MonoBehaviour
     void Update() {
         bool grounded = false;
         if (this.currentState != PlayerStates.Dialog) {
-            grounded = this.movement.Grounded();
+            grounded = this.movement.UpdateGrounded();
             this.currentState = grounded ? PlayerStates.Grounded : PlayerStates.Aerial;
         }
         WinchButtonText = null;
@@ -240,9 +240,9 @@ public class PlayerController : MonoBehaviour
             if (UseWinch(ref consumeInput)) return;
         }
         if (HandleRope(ref consumeInput)) return;
-        movement.HandleInput(grounded);
+        movement.HandleInput();
         UpdateUIControlsDisplay();
-        animator.SetFloat("XSpeed", movement.rb.velocity.magnitude);
+        animator.SetFloat("XSpeed", Mathf.Abs(movement.currentVelocity.x));
         if (Input.GetAxis("Horizontal") > 0) {
             renderer.flipX = true;
         } else if (Input.GetAxis("Horizontal") < 0) {
