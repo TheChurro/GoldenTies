@@ -21,6 +21,8 @@ public class PlayerPhysics : MonoBehaviour
     private bool sliding;
     private MovementController controller;
     public Vector2 currentVelocity;
+    public bool testMovement;
+    public Vector2 testInput;
     // Start is called before the first frame update
     void Awake()
     {
@@ -50,6 +52,9 @@ public class PlayerPhysics : MonoBehaviour
         this.UpdateGrounded();
         if (!this.sliding) {
             float targetXVel = this.maxHorizSpeed * Input.GetAxisRaw("Horizontal");
+            if (testMovement) {
+                targetXVel = this.maxHorizSpeed * testInput.x;
+            }
             Vector2 normal = Vector2.up;
             Vector2 rightSlopeDir = Vector2.right;
             if (this.controller.support.onSlope) {
@@ -70,7 +75,7 @@ public class PlayerPhysics : MonoBehaviour
         // CHANGE IF GROUNDED
         if (grounded && !this.sliding) {
             if (Input.GetButtonDown("Jump")) {
-                this.currentVelocity.y += jumpSpeed;
+                this.currentVelocity.y = jumpSpeed;
             }
         } else {
             if (this.currentVelocity.y > 0 && Input.GetButton("Jump")) {

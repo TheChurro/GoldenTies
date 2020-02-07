@@ -76,7 +76,7 @@ public class PlayerController : MonoBehaviour
     private Interactable.Interaction interaction;
     private int dialogIndex;
     public RoomManager manager;
-    public SpriteRenderer renderer;
+    public SpriteRenderer spriteRenderer;
     void ShowDialog() {
         if (!DialogPanel.activeSelf) DialogPanel.SetActive(true);
         if (hasInteraction && 0 <= dialogIndex && dialogIndex < interaction.dialog.Length) {
@@ -244,9 +244,9 @@ public class PlayerController : MonoBehaviour
         UpdateUIControlsDisplay();
         animator.SetFloat("XSpeed", Mathf.Abs(movement.currentVelocity.x));
         if (Input.GetAxis("Horizontal") > 0) {
-            renderer.flipX = true;
+            spriteRenderer.flipX = true;
         } else if (Input.GetAxis("Horizontal") < 0) {
-            renderer.flipX = false;
+            spriteRenderer.flipX = false;
         }
     }
 

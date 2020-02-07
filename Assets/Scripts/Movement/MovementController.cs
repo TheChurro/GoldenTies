@@ -6,12 +6,16 @@ using System;
 public class MovementController : RaycastMovement
 {
     public float maxSlope;
+    public float stepHeight;
     [SerializeField]
     private float cosMaxSlope;
     public float elasticity;
     public SupportInfo support;
     public bool Sliding() {
         return this.support.slopeCos < cosMaxSlope;
+    }
+    public bool Grounded() {
+        return this.support.hitBottom;
     }
 
     // Start is called before the first frame update
@@ -21,11 +25,42 @@ public class MovementController : RaycastMovement
         cosMaxSlope = Mathf.Cos(Mathf.Deg2Rad * maxSlope);
     }
 
-    private struct SlopeTransition {
-        public bool doTransition;
-        public float cosSlope;
-        public bool descend;
-        public bool ascend;
+    private void AdjustVelocityForSlope(
+        ref Vector2 velocity,
+        ref float targetDistance,
+        ref Vector2 direction,
+        bool allowJumping
+    ) {
+        // Check to see if last we knew we were on a slope. If so,
+        // restrict our movement to that slope.
+        if (support.onSlope) {
+            float normMovement = Vector2.Dot(support.hitNormal, velocity);
+            // As long as we are not moving away from the slope...
+            if (!allowJumping || normMovement < EPSILON) {
+                // If we are standing on the slope, then align our movement to the slope
+                // Make our direction and velocity perpendicular to the surface we are on
+                Vector2 movementDir = new Vector2(support.hitNormal.y, -support.hitNormal.x);
+                if (support.hitNormal.y > 0 && support.slopeCos < cosMaxSlope) {
+                    // If the slope we are on is too steep
+                    // Ensure we are moving dowards.
+                    if (movementDir.y > 0) {
+                        movementDir *= -1;
+                    }
+                } else {
+                    if (movementDir.x < 0 != direction.x < 0) {
+                        movementDir *= -1;
+                    }
+                }
+                float velInMoveDir = Vector2.Dot(velocity, movementDir);
+                targetDistance *= Mathf.Abs(velInMoveDir / velocity.magnitude);
+                velocity = velInMoveDir * movementDir;
+                direction = movementDir;
+            } else {
+                // Moving away from the slope, not on it.
+                support.onSlope = false;
+                support.hitBottom = false;
+            }
+        }
     }
 
     public void Move(ref Vector2 velocity, float timeStep, Vector2 input) {
@@ -36,14 +71,22 @@ public class MovementController : RaycastMovement
         }
 
         Physics2D.SyncTransforms();
-        UpdateRayOrigins();
 
         Vector2 targetDisplacement = velocity * timeStep;
         Vector2 direction = targetDisplacement.normalized;
         float targetDistance = targetDisplacement.magnitude;
-        Vector2 displacement = Vector2.zero;
 
-        SlopeTransition transition = new SlopeTransition{};
+        AdjustVelocityForSlope(
+            ref velocity,
+            ref targetDistance,
+            ref direction,
+            true
+        );
+
+        Vector2 position = this.transform.position;
+        position += this.box.offset;
+        Vector2 size = this.box.size - 2 * skinWidth * Vector2.one;
+        Collider2D lastContact = null;
         for (int i = 0; i < 4; i++) {
             // Don't move if we are too slow.
             if (velocity.magnitude < EPSILON) {
@@ -53,67 +96,19 @@ public class MovementController : RaycastMovement
             if (targetDistance < EPSILON) {
                 break;
             }
-
-            // Check to see if last we knew we were on a slope.
-            if (support.onSlope) {
-                float normMovement = Vector2.Dot(support.hitNormal, velocity);
-                // As long as we are not moving away from the slope...
-                if (normMovement < EPSILON) {
-                    // Make our direction and velocity perpendicular to the surface we are on
-                    Vector2 movementDir = new Vector2(support.hitNormal.y, -support.hitNormal.x);
-                    if (support.hitNormal.y > 0 && support.slopeCos < cosMaxSlope) {
-                        // If the slope we are on is too steep
-                        // Ensure we are moving dowards.
-                        if (movementDir.y > 0) {
-                            movementDir *= -1;
-                        }
-                        velocity = Mathf.Abs(velocity.y) * movementDir;
-                    } else {
-                        if (movementDir.x < 0 != direction.x < 0) {
-                            movementDir *= -1;
-                        }
-                        float velInMoveDir = Vector2.Dot(velocity, movementDir);
-                        targetDistance *= Mathf.Abs(velInMoveDir / velocity.magnitude);
-                        velocity = velInMoveDir * movementDir;
-                    }
-                    direction = movementDir;
-                } else {
-                    // Moving away from the slope, not on it.
-                    support.onSlope = false;
-                }
-            }
+            
             support.Reset();
-            transition = new SlopeTransition{};
             // Extend the distance we move to account for moving backwards by skin width.
             float skinAdjustFactor = 1 + Mathf.Max(direction.x * direction.x, direction.y * direction.y);
             float distance = targetDistance + skinWidth * Mathf.Sqrt(skinAdjustFactor);
-            int hitRay = -1;
-            if (Mathf.Abs(direction.x) > EPSILON) {
-                var side = direction.x < 0 ? RaycastBoundarySide.Left : RaycastBoundarySide.Right;
-                DetectCollisions(
-                    GetRayLine(side),
-                    side,
-                    true,
-                    false,
-                    ref transition,
-                    ref distance,
-                    direction,
-                    ref hitRay
-                );
-            }
-            if (Mathf.Abs(direction.y) > EPSILON) {
-                var side = direction.y < 0 ? RaycastBoundarySide.Bottom : RaycastBoundarySide.Top;
-                DetectCollisions(
-                    GetRayLine(side),
-                    side,
-                    Mathf.Abs(direction.x) <= EPSILON,
-                    side == RaycastBoundarySide.Bottom,
-                    ref transition,
-                    ref distance,
-                    direction
-                );
-            }
-            if (distance < -EPSILON) {
+            this.DetectCollisions(
+                position,
+                size,
+                ref distance,
+                direction,
+                ref lastContact
+            );
+            if (distance < 0) {
                 distance = 0;
             }
             // In the case that we moved further than our skin width factor, truncate.
@@ -122,178 +117,185 @@ public class MovementController : RaycastMovement
             if (distance > targetDistance) {
                 distance = targetDistance;
             }
-            bool move = true;
-            if (transition.doTransition) {
+            position += distance * direction;
+            targetDistance -= distance;
+            // In the case where we hit nothing, check to see if we
+            // should try to stick to the slope we are on.
+            if (!support.hit) {
+                StickToSlopes(ref position, size, targetDistance);
+            }
+
+            if (support.hitBottom) {
+                // If we are supported below, transition our velocity
+                // to the new slope. We are *not* jumping off.
                 support.onSlope = true;
-            } else {
-                bool hitVert = support.hitBottom || support.hitTop;
-                bool hitHoriz = support.hitLeft || support.hitRight;
-                Color col = new Color[]{Color.blue, Color.yellow, Color.black, Color.cyan}[i];
-                if (hitVert || hitHoriz) {
-                    // If we hit something on the side, which is facing downards and we are
-                    // moving downwards, then we are missing detecting the corner of an object
-                    // as one of the lower positions should have hit the upwards facing side first.
-                    // As such, we will consider this a hard right wall. But, we cannot move forwards
-                    // in this step as otherwise, we will be straddling the edge making the
-                    // top of the corner. So, we've been bamboozled, and will just reflect away
-                    // at the current position and hope it isn't noticeable.
-                    if (support.latestHitSide.IsHorizontal() && support.hitNormal.y < -EPSILON) {
-                        support.hitNormal = Vector2.right * (direction.x < 0 ? 1 : -1);
-                        move = false;
-                    }
-                    // float normalVel = Vector2.Dot(support.hitNormal, velocity);
-                    // Vector2 nextVelocity = velocity - (1 + elasticity) * normalVel * support.hitNormal;
-                    // direction = nextVelocity.normalized;
-                    // targetDistance *= nextVelocity.magnitude / velocity.magnitude;
-                    // velocity = nextVelocity;
-                    if (support.wasOnSlope) {
-                        support.onSlope = support.wasOnSlope;
-                        support.hitNormal = support.oldHitNormal;
+                AdjustVelocityForSlope(
+                    ref velocity,
+                    ref targetDistance,
+                    ref direction,
+                    false
+                );
+            } else if (support.hit) {
+                support.onSlope = false;
+                // Reflect our velocity off the hit slope
+                float normVelocity = Vector2.Dot(support.hitNormal, velocity);
+                if (normVelocity < 0) {
+                    float currentSpeed = velocity.magnitude;
+                    // Cancel out our movement towards the hit normal.
+                    Vector2 newVelocity = velocity - (1 + elasticity) * normVelocity * support.hitNormal;
+                    // Adjust distance for new velocity.
+                    targetDistance *= newVelocity.magnitude / currentSpeed;
+                    velocity = newVelocity;
+                    // If zero movement
+                    if (targetDistance < EPSILON) {
+                        direction = Vector2.zero;
                     } else {
-                        support.onSlope = true;
+                        direction = newVelocity.normalized;
                     }
-                } else {
-                    support.onSlope = support.wasOnSlope;
-                    support.hitNormal = support.oldHitNormal;
                 }
             }
-            if (move) {
-                this.TranslateRayOrigins(direction * distance);
-                displacement += direction * distance;
-                targetDistance -= distance;
+        }
+        if (!support.hitBottom) {
+            StickToSlopes(ref position, size, velocity.magnitude);
+            if (support.hitBottom) {
+                AdjustVelocityForSlope(
+                    ref velocity,
+                    ref targetDistance,
+                    ref direction,
+                    false
+                );
             }
         }
-
-        this.transform.Translate(displacement);
+        Vector3 outPos = position - this.box.offset;
+        outPos.z = this.transform.position.z;
+        this.transform.position = outPos;
     }
 
-    private void DetectCollisions(
-        RaycastBoundaryLine line,
-        RaycastBoundarySide boundarySide,
-        bool climbSlopes,
-        bool descendSlopes,
-        ref SlopeTransition transition,
-        ref float moveDistance,
-        Vector2 direction,
-        bool verbose=false
+    private void StickToSlopes(
+        ref Vector2 position,
+        Vector2 size,
+        float movement
     ) {
-        int hitRay = 0;
-        DetectCollisions(line, boundarySide, climbSlopes, descendSlopes, ref transition, ref moveDistance, direction, ref hitRay, verbose);
-    }
-
-    private void DetectCollisions(
-        RaycastBoundaryLine line,
-        RaycastBoundarySide boundarySide,
-        bool climbSlopes,
-        bool descendSlopes,
-        ref SlopeTransition transition,
-        ref float moveDistance,
-        Vector2 direction,
-        ref int hitRay,
-        bool verbose=false
-    ) {
-        if (verbose && climbSlopes && descendSlopes) {
-            print("-- CLIMBING AND DESCENDING!");
-        }
-        // Check for descending slopes on the opposite direction of movement.
-        int descendingIndex = direction.x < 0 ? line.numRays - 1 : 0;
-        int ascendingIndex = boundarySide != RaycastBoundarySide.Bottom ? 0 : direction.x < 0 ? 0 : line.numRays - 1;
-        for (int i = 0; i < line.numRays; i++) {
-            Vector2 rayOrigin = line.origin + i * line.displacement;
-            var hit = Physics2D.Raycast(rayOrigin, direction, moveDistance, collisionMask);
-            if (hit) {
-                Debug.DrawRay(rayOrigin, direction * hit.distance, Color.red);
-            } else {
-                Debug.DrawRay(rayOrigin, direction * moveDistance, Color.green);
-            }
+        // If we were on a slope in the last iteration then we will check to see if
+        // we are still on a slope, and if so, drop down to it. This is especially
+        // useful for when you climb over the top of one slope only to drop down
+        // the next one.
+        if (support.didHitBottom) {
+            float checkDistance = Mathf.Infinity;
+            Collider2D none = null;
+            DetectCollisions(position, size, ref checkDistance, Vector2.down, ref none);
             
-            if (hit && hit.distance != 0) {
-                hitRay = i;
-                support.latestHitSide = boundarySide;
-                support.hitNormal = hit.normal;
-                // Skin adjusted sizes
-                switch (boundarySide) {
-                    case RaycastBoundarySide.Bottom:
-                    case RaycastBoundarySide.Top:
-                        moveDistance = hit.distance - Mathf.Abs(skinWidth / direction.y);
-                        break;
-                    case RaycastBoundarySide.Left:
-                    case RaycastBoundarySide.Right:
-                        moveDistance = hit.distance -  Mathf.Abs(skinWidth / direction.x);
-                        break;
-                }
-                if (i == ascendingIndex && climbSlopes) {
-                    transition.ascend = true;
-                    transition.cosSlope = Vector2.Dot(Vector2.up, hit.normal);
-                    transition.doTransition = true;
-                    continue;
-                }
-                // We always descend down slopes. The only caveat is that we may
-                // not have control on those slopes
-                if (i == descendingIndex && descendSlopes) {
-                    transition.descend = true;
-                    transition.cosSlope = Vector2.Dot(Vector2.up, hit.normal);
-                    transition.doTransition = true;
-                    continue;
-                }
-                switch (boundarySide) {
-                    case RaycastBoundarySide.Bottom: support.hitBottom = true; break;
-                    case RaycastBoundarySide.Top: support.hitTop = true; break;
-                    case RaycastBoundarySide.Left: support.hitLeft = true; break;
-                    case RaycastBoundarySide.Right: support.hitRight = true; break;
-                }
-                transition.doTransition = false;
+            Debug.DrawRay(position, Mathf.Abs(support.oldSlopeSin) * movement * Vector2.down, Color.red);
+            Debug.DrawRay(position + Vector2.down * checkDistance, Mathf.Abs(support.slopeSin) * movement * Vector2.up, Color.green);
+            // If we hit something below us, then we are over a surface. If that surface
+            // can be stood on, (aka, has a small enough angle) and we are close enough
+            // to the surface to reasonable hit it at our current speed
+            if (support.hitBottom && support.slopeCos >= cosMaxSlope && checkDistance - skinWidth <= Mathf.Abs(support.oldSlopeSin) * movement + Mathf.Abs(support.slopeSin) * movement) {
+                DebugDraws.DrawBox(position + Vector2.down * checkDistance, size, Color.green);
+                support.onSlope = true;
+                position = position + checkDistance * Vector2.down;
+                return;
+            } else {
+                DebugDraws.DrawBox(position + Vector2.down * checkDistance, size, Color.red);
+            }
+            support.hitBottom = false;
+        }
+    }
+
+    private void DetectCollisions(
+        Vector2 position,
+        Vector2 size,
+        ref float moveDistance,
+        Vector2 direction,
+        ref Collider2D ignore,
+        bool verbose=false
+    ) {
+        var hits = Physics2D.BoxCastAll(position, size, 0, direction, moveDistance, this.collisionMask);
+        RaycastHit2D hit = new RaycastHit2D{};
+        float minHit = moveDistance + 10;
+        for (int i = 0; i < hits.Length; i++) {
+            if (hits[i].collider != ignore && hits[i].distance < minHit) {
+                hit = hits[i];
+                minHit = hit.distance;
             }
         }
-        if (verbose && climbSlopes && descendSlopes) {
-            print("---- Got " + transition.ascend + " and " + transition.descend);
+        if (hit) {
+            ignore = hit.collider;
+            // Move, but adjust for the fact that our cast doesn't account for a skinwidth border
+            float adjust = Mathf.Min(hit.distance, skinWidth / Mathf.Abs(direction.y), skinWidth / Mathf.Abs(direction.x));
+            moveDistance = hit.distance - adjust;
+            var centroid = position + direction * moveDistance;
+
+            // DebugDraws.DrawBox(hit.centroid, size, Color.red);
+            // DebugDraws.DrawBox(centroid, size + 2 * skinWidth * Vector2.one);
+            // Debug.DrawLine(hit.centroid, hit.point, Color.red);
+            // Debug.DrawLine(hit.centroid, centroid, Color.white);
+
+            // Here we use a compute centroid which naturally accounts of ambiguities surrounding
+            // us hitting corners. Gives us a lenience of skinWidth in either direction.
+            var relativeToEnd = hit.point - centroid;
+            if (relativeToEnd.x <= -size.x / 2) {
+                support.hitLeft = true;
+            } else if (relativeToEnd.x >= size.x / 2) {
+                support.hitRight = true;
+            }
+            if (relativeToEnd.y <= -size.y / 2) {
+                support.hitBottom = true;
+            } else if (relativeToEnd.y >= size.y / 2) {
+                support.hitTop = true;
+            }
+            support.hitNormal = hit.normal;
+        } else {
+            if (moveDistance != Mathf.Infinity) {
+                DebugDraws.DrawBox(position + moveDistance * direction, size + 2 * skinWidth * Vector2.one);
+            }
         }
-    }
-
-    public bool Grounded()
-    {
-        this.UpdateRayOrigins();
-        this.support.Reset();
-        SlopeTransition transition = new SlopeTransition{};
-        float moveDistance = 2f * skinWidth;
-        this.DetectCollisions(
-            this.GetRayLine(RaycastBoundarySide.Bottom),
-            RaycastBoundarySide.Bottom,
-            true,
-            true,
-            ref transition,
-            ref moveDistance,
-            Vector2.down
-        );
-        if (transition.doTransition) {
-            this.support.onSlope = true;
-        }
-        return this.support.hitBottom || transition.doTransition;
-    }
-
-    void OnDrawGizmos() {
-
     }
 }
 
 [System.Serializable]
 public struct SupportInfo {
     public bool hitTop, hitBottom, hitLeft, hitRight;
-    public bool wasOnSlope;
+    public bool didHitTop, didHitBottom, didHitLeft, didHitRight;
+    public bool hitHoriz { get { return hitLeft || hitRight; } }
+    public bool hitVert { get { return hitLeft || hitRight; } }
+    public bool hit { get { return hitTop || hitBottom || hitLeft || hitRight; } }
     public bool onSlope;
+    public bool wasOnSlope;
     public Vector2 hitNormal;
-    public Vector2 oldHitNormal;
-    public RaycastBoundarySide latestHitSide;
+    public Vector2 lastHitNormal;
+    public float slopeTan { get { return this.hitNormal.x / this.hitNormal.y; } }
+    public float slopeSin { get { return this.hitNormal.x; } }
     public float slopeCos { get { return this.hitNormal.y; } }
-    public float oldSlopeCos { get { return this.oldHitNormal.y; } }
+    public float oldSlopeTan { get { return this.lastHitNormal.x / this.lastHitNormal.y; } }
+    public float oldSlopeSin { get { return this.lastHitNormal.x; } }
+    public float oldSlopeCos { get { return this.lastHitNormal.y; } }
     public void Reset() {
+        didHitBottom = hitBottom;
+        didHitTop = hitTop;
+        didHitLeft = hitLeft;
+        didHitRight = hitRight;
         hitTop = false;
         hitBottom = false;
         hitLeft = false;
         hitRight = false;
-        oldHitNormal = hitNormal;
+        lastHitNormal = hitNormal;
         wasOnSlope = onSlope;
         hitNormal = Vector2.up;
         onSlope = false;
+    }
+}
+
+static class DebugDraws {
+    public static void DrawBox(Vector2 position, Vector2 size) {
+        DrawBox(position, size, Color.white);
+    }
+    public static void DrawBox(Vector2 position, Vector2 size, Color c) {
+        Vector2 right = new Vector2(size.x / 2, 0);
+        Vector2 up = new Vector2(0, size.y / 2);
+        Debug.DrawLine(position - right - up, position + right - up, c);
+        Debug.DrawLine(position + right - up, position + right + up, c);
+        Debug.DrawLine(position + right + up, position - right + up, c);
+        Debug.DrawLine(position - right + up, position - right - up, c);
     }
 }
