@@ -214,9 +214,12 @@ public class MovementController : RaycastMovement
         RaycastHit2D hit = new RaycastHit2D{};
         float minHit = moveDistance + 10;
         for (int i = 0; i < hits.Length; i++) {
+            if (hits[i].collider.isTrigger) continue;
             // If you are hitting the same edge of the same collider, ignore it. We already
             // have that support.
-            bool sameHit = hits[i].collider == ignore && (support.lastHitNormal - hits[i].normal).magnitude < EPSILON;
+            bool sameHit = hits[i].collider == ignore &&
+                            (support.lastHitNormal - hits[i].normal).magnitude < EPSILON &&
+                            Vector2.Dot(hits[i].point - support.lastHitPoint, support.lastHitNormal) < EPSILON;
             if (!sameHit && hits[i].distance < minHit) {
                 if (hits[i].distance == 0 && Vector2.Dot(hits[i].normal, direction) > 0) { continue; }
                 hit = hits[i];
@@ -249,7 +252,9 @@ public class MovementController : RaycastMovement
                 support.hitTop = true;
             }
             support.hitNormal = hit.normal;
+            support.hitPoint = hit.point;
         } else {
+            ignore = null;
             if (moveDistance != Mathf.Infinity) {
                 DebugDraws.DrawBox(position + moveDistance * direction, size + 2 * skinWidth * Vector2.one);
             }
@@ -268,6 +273,8 @@ public struct SupportInfo {
     public bool wasOnSlope;
     public Vector2 hitNormal;
     public Vector2 lastHitNormal;
+    public Vector2 hitPoint;
+    public Vector2 lastHitPoint;
     public float slopeTan { get { return this.hitNormal.x / this.hitNormal.y; } }
     public float slopeSin { get { return this.hitNormal.x; } }
     public float slopeCos { get { return this.hitNormal.y; } }
@@ -287,6 +294,8 @@ public struct SupportInfo {
         wasOnSlope = onSlope;
         hitNormal = Vector2.up;
         onSlope = false;
+        lastHitNormal = hitPoint;
+        hitPoint = Vector2.zero;
     }
 }
 
