@@ -214,7 +214,11 @@ public class MovementController : RaycastMovement
         RaycastHit2D hit = new RaycastHit2D{};
         float minHit = moveDistance + 10;
         for (int i = 0; i < hits.Length; i++) {
-            if (hits[i].collider != ignore && hits[i].distance < minHit) {
+            // If you are hitting the same edge of the same collider, ignore it. We already
+            // have that support.
+            bool sameHit = hits[i].collider == ignore && (support.lastHitNormal - hits[i].normal).magnitude < EPSILON;
+            if (!sameHit && hits[i].distance < minHit) {
+                if (hits[i].distance == 0 && Vector2.Dot(hits[i].normal, direction) > 0) { continue; }
                 hit = hits[i];
                 minHit = hit.distance;
             }
